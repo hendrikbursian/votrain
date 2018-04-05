@@ -1,6 +1,15 @@
 <template>
-<div class="container">
-    <router-link to="home">Home</router-link>
-    <router-link to="editor">Editor</router-link>
-</div>
+<h2>Home</h2>
 </template>
+
+<style scoped>
+.menu {
+    flex: 70%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+ul {
+    list-style-type: none;
+}
+</style>
