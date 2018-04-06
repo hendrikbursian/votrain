@@ -132,6 +132,7 @@ export default new Vuex.Store({
                     ) {
                         commit('addDictionary')
                         commit('emptyNewDictionary')
+                        commit('toggleEdit')
                         resolve()
                     } else {
                         alert('Das Wörterbuch ist bereits enthalten')

@@ -4,9 +4,9 @@
             <button :key="1" v-on:click="$store.commit('toggleEdit')">
                 <i class="material-icons">{{ edit ? 'close' : 'book' }}</i>{{ edit ? 'Abbrechen' : 'Wörterbuch hinzufügen' }}
             </button>
-            <input :key="2" type="text" v-if="edit" v-model="newDictionary.lang1" @keyup.enter="addDictionary(); $store.commit('toggleEdit')" placeholder="Sprache 1" autofocus>
-            <input :key="3" type="text" v-if="edit" v-model="newDictionary.lang2" @keyup.enter="addDictionary(); $store.commit('toggleEdit')" placeholder="Sprache 2">
-            <button :key="4" v-if="edit" v-on:click="addDictionary(); $store.commit('toggleEdit')">
+            <input :key="2" type="text" v-if="edit" v-model="newDictionary.lang1" @keyup.enter="addDictionary()" placeholder="Sprache 1" autofocus>
+            <input :key="3" type="text" v-if="edit" v-model="newDictionary.lang2" @keyup.enter="addDictionary()" placeholder="Sprache 2">
+            <button :key="4" v-if="edit" v-on:click="addDictionary()">
                 <i class="material-icons">save</i> Speichern
             </button>
         </transition-group>
