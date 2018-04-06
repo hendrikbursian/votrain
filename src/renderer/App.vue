@@ -10,7 +10,8 @@
             </select>
         </div>
         <nav>
-            <router-link to="editor">Editor</router-link>
+            <router-link to="dictionaries">Wörterbücher</router-link>
+            <router-link to="vocabularies">Vokabeln</router-link>
         </nav>
     </header>
     <main>
@@ -74,6 +75,9 @@ nav {
 }
 nav a {
     padding: 1em;
+}
+nav a.router-link-active {
+    color: #333;
 }
 main {
     flex: 90%;
