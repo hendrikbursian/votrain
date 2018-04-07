@@ -74,14 +74,8 @@ export default {
         })
     },
     beforeMount() {
-        Mousetrap.bind('n', () => {
-            this.$store.commit('toggleAddingVocabulary')
-        })
+        Mousetrap.bind('n', () => this.$store.commit('toggleAddingVocabulary'))
         Mousetrap.bind('b', () => this.$store.commit('toggleEditingVocabulary'))
-    },
-    beforeDestroy() {
-        Mousetrap.unbind('n')
-        Mousetrap.unbind('b')
     }
 }
 </script>

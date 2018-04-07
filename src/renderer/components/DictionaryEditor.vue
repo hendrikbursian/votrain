@@ -60,10 +60,6 @@ export default {
     beforeMount() {
         Mousetrap.bind('n', () => this.$store.commit('toggleAddingDictionary'))
         Mousetrap.bind('b', () => this.$store.commit('toggleEditingDictionary'))
-    },
-    beforeDestroy() {
-        Mousetrap.unbind('n')
-        Mousetrap.unbind('b')
     }
 }
 </script>
