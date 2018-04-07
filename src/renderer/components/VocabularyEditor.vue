@@ -1,8 +1,8 @@
 <template>
     <div class="u-full-width">
         <transition-group tag="div" class="menu-bar u-full-width" name="slideLeft-fade">
-            <button :key="1" v-on:click="$store.commit('toggleSearch')">
-                <i class="material-icons">{{ search ? 'close' : 'search' }}</i> {{ search ? 'Abbrechen' : 'Suchen' }}
+            <button :key="1" v-on:click="$store.commit('toggleFilter')">
+                <i class="material-icons">{{ filter ? 'close' : 'filter_list' }}</i> {{ filter ? 'Abbrechen' : 'Filtern' }}
             </button>
             <button :key="2" v-on:click="$store.commit('toggleAddingVocabulary')">
                 <i class="material-icons">{{ addingVocabulary ? 'close' : 'add' }}</i> {{ addingVocabulary ? 'Abbrechen' : 'Wort hinzufügen' }}
@@ -20,13 +20,13 @@
         </transition-group>
         <table class="u-full-width">
             <thead>
-                <tr v-if="!search">
+                <tr v-if="!filter">
                     <th style="width:25%">{{ activeDictionary.lang1 }}</th>
                     <th style="width:25%">{{ activeDictionary.lang2 }}</th>
                     <th style="width:25%">Notiz</th>
                     <th style="width:25%">Kategorie</th>
                 </tr>
-                <tr v-if="search">
+                <tr v-if="filter">
                     <th style="width:25%"><input type="text" v-model="query.lang1" :placeholder="activeDictionary.lang1"></th>
                     <th style="width:25%"><input type="text" v-model="query.lang2" :placeholder="activeDictionary.lang2"></th>
                     <th style="width:25%"><input type="text" v-model="query.note" placeholder="Notiz"></th>
@@ -57,7 +57,7 @@ import { mapGetters, mapState, mapActions } from 'vuex'
 export default {
     computed: {
         ...mapState({
-            search: 'search',
+            filter: 'filter',
             query: 'query',
             addingVocabulary: 'addingVocabulary',
             editingVocabulary: 'editingVocabulary',

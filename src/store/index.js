@@ -10,7 +10,7 @@ const store = {
     addingDictionary: false,
     editingDictionary: false,
     editingVocabulary: false,
-    search: false,
+    filter: false,
     newVocabulary: {
         lang1: '',
         lang2: '',
@@ -44,7 +44,7 @@ export default new Vuex.Store({
             )
         },
         filteredVocabularies(state, getters) {
-            if (state.search)
+            if (state.filter)
                 return getters.activeDictionary.vocabularies.filter(voc => {
                     return (
                         voc.lang1.search(state.query.lang1) !== -1 &&
@@ -162,8 +162,8 @@ export default new Vuex.Store({
         toggleEditingVocabulary(state) {
             state.editingVocabulary = !state.editingVocabulary
         },
-        toggleSearch(state) {
-            state.search = !state.search
+        toggleFilter(state) {
+            state.filter = !state.filter
         }
     }
 })

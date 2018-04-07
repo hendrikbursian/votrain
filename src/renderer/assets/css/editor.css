@@ -27,7 +27,7 @@ td input[type='text'] {
     margin-bottom: 0;
 }
 
-.menu-bar :last-child {
+.menu-bar > :last-child {
     margin-right: 0;
 }
 

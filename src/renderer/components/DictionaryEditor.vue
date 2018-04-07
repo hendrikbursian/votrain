@@ -16,9 +16,9 @@
         <table class="u-full-width">
             <thead>
                 <tr>
-                    <th style="width:25%">Sprache 1</th>
-                    <th style="width:25%">Sprache 2</th>
-                    <th style="width:25%">Vokabeln</th>
+                    <th style="width:33%">Sprache 1</th>
+                    <th style="width:33%">Sprache 2</th>
+                    <th style="width:33%">Vokabeln</th>
                 </tr>
             </thead>
             <tbody>
