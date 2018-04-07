@@ -2,11 +2,14 @@
     <div class="u-full-width">
         <transition-group tag="div" class="menu-bar u-full-width" name="slideLeft-fade">
             <button :key="1" v-on:click="$store.commit('toggleAddingDictionary')">
-                <i class="material-icons">{{ addingDictionary ? 'close' : 'book' }}</i>{{ addingDictionary ? 'Abbrechen' : 'Wörterbuch hinzufügen' }}
+                <i class="material-icons">{{ addingDictionary ? 'close' : 'book' }}</i> {{ addingDictionary ? 'Abbrechen' : 'Wörterbuch hinzufügen' }}
             </button>
-            <input :key="2" type="text" v-if="addingDictionary" v-model="newDictionary.lang1" @keyup.enter="addDictionary()" placeholder="Sprache 1" autofocus>
-            <input :key="3" type="text" v-if="addingDictionary" v-model="newDictionary.lang2" @keyup.enter="addDictionary()" placeholder="Sprache 2">
-            <button :key="4" v-if="addingDictionary" v-on:click="addDictionary()">
+            <button :key="2" v-on:click="$store.commit('toggleEditingDictionary')">
+                <i class="material-icons">{{ editingDictionary ? 'save' : 'edit' }}</i> {{ editingDictionary ? 'Speichern' : 'Wörterbücher bearbeiten' }}
+            </button>
+            <input :key="3" type="text" v-if="addingDictionary" v-model="newDictionary.lang1" @keyup.esc="$store.commit('toggleAddingDictionary')" @keyup.enter="addDictionary()" placeholder="Sprache 1">
+            <input :key="4" type="text" v-if="addingDictionary" v-model="newDictionary.lang2" @keyup.esc="$store.commit('toggleAddingDictionary')" @keyup.enter="addDictionary()" placeholder="Sprache 2">
+            <button :key="5" v-if="addingDictionary" v-on:click="addDictionary()">
                 <i class="material-icons">save</i> Speichern
             </button>
         </transition-group>
@@ -19,9 +22,14 @@
                 </tr>
             </thead>
             <tbody>
-                <tr v-bind:class="{active: dictionary.id === activeDictionary}" v-on:click="$store.commit('setActiveDictionary', dictionary.id); $router.push('vocabularies')" :key="index" v-for="(dictionary, index) in dictionaries">
+                <tr v-if="!editingDictionary" v-bind:class="{active: dictionary.id === activeDictionary}" v-on:click="$store.commit('setActiveDictionary', dictionary.id); $router.push('vocabularies')" :key="index" v-for="(dictionary, index) in dictionaries">
                     <td>{{ dictionary.lang1 }}</td>
                     <td>{{ dictionary.lang2 }}</td>
+                    <td>{{ dictionary.vocabularies.length }}</td>
+                </tr>
+                <tr v-if="editingDictionary" v-bind:class="{active: dictionary.id === activeDictionary}" :key="index" v-for="(dictionary, index) in dictionaries">
+                    <td><input type="text" v-model="dictionary.lang1" @keyup.enter="$store.commit('toggleEditingDictionary')" placeholder="Sprache 1" /></td>
+                    <td><input type="text" v-model="dictionary.lang2" @keyup.enter="$store.commit('toggleEditingDictionary')" placeholder="Sprache 2" /></td>
                     <td>{{ dictionary.vocabularies.length }}</td>
                 </tr>
             </tbody>
@@ -36,58 +44,28 @@ export default {
     computed: {
         ...mapState({
             addingDictionary: 'addingDictionary',
+            editingDictionary: 'editingDictionary',
             newDictionary: 'newDictionary',
             activeDictionary: 'activeDictionary'
         }),
         ...mapGetters({
-            dictionaries: 'dictionaries',
+            dictionaries: 'dictionaries'
         })
     },
     methods: {
         ...mapActions({
             addDictionary: 'addDictionary'
         })
+    },
+    beforeMount() {
+        Mousetrap.bind('n', () => this.$store.commit('toggleAddingDictionary'))
+        Mousetrap.bind('b', () => this.$store.commit('toggleEditingDictionary'))
+    },
+    beforeDestroy() {
+        Mousetrap.unbind('n')
+        Mousetrap.unbind('b')
     }
 }
 </script>
 
-<style>
-.menu-bar {
-    display: flex;
-    flex-direction: row;
-    margin-bottom: 1em;
-}
-th {
-    height: 64px;
-}
-tbody tr.active {
-    background: #ddd;
-}
-tbody tr:hover {
-    background: #eee;
-    cursor: pointer;
-}
-
-.menu-bar input {
-    width: 20%;
-}
-
-.menu-bar :last-child {
-    margin-right: 0;
-}
-
-button i {
-    margin-right: 8px;
-}
-
-.slideLeft-fade-enter-active,
-.slideLeft-fade-leave-active {
-    transition: all 0.33s ease;
-}
-
-.slideLeft-fade-enter,
-.slideLeft-fade-leave-to {
-    transform: translateX(-45px);
-    opacity: 0;
-}
-</style>
+<style src="../assets/css/editor.css"></style>

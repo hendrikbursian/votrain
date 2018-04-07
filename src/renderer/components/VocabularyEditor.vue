@@ -2,16 +2,19 @@
     <div class="u-full-width">
         <transition-group tag="div" class="menu-bar u-full-width" name="slideLeft-fade">
             <button :key="1" v-on:click="$store.commit('toggleSearch')">
-                <i class="material-icons">{{ search ? 'close' : 'search' }}</i>{{ search ? 'Abbrechen' : 'Suchen' }}
+                <i class="material-icons">{{ search ? 'close' : 'search' }}</i> {{ search ? 'Abbrechen' : 'Suchen' }}
             </button>
             <button :key="2" v-on:click="$store.commit('toggleAddingVocabulary')">
-                <i class="material-icons">{{ addingVocabulary ? 'close' : 'add' }}</i>{{ addingVocabulary ? 'Abbrechen' : 'Wort hinzufügen' }}
+                <i class="material-icons">{{ addingVocabulary ? 'close' : 'add' }}</i> {{ addingVocabulary ? 'Abbrechen' : 'Wort hinzufügen' }}
             </button>
-            <input :key="3" type="text" v-if="addingVocabulary" v-model="newVocabulary.lang1" @keyup.enter="addVocabulary()" :placeholder="activeDictionary.lang1" autofocus>
-            <input :key="4" type="text" v-if="addingVocabulary" v-model="newVocabulary.lang2" @keyup.enter="addVocabulary()" :placeholder="activeDictionary.lang2">
-            <input :key="5" type="text" v-if="addingVocabulary" v-model="newVocabulary.note" @keyup.enter="addVocabulary()" placeholder="Notiz">
-            <input :key="6" type="text" v-if="addingVocabulary" v-model="newVocabulary.category" @keyup.enter="addVocabulary()" placeholder="Kategorie">
-            <button :key="7" v-if="addingVocabulary" v-on:click="addVocabulary()">
+            <button :key="3" v-on:click="$store.commit('toggleEditingVocabulary')">
+                <i class="material-icons">{{ editingVocabulary ? 'save' : 'edit' }}</i> {{ editingVocabulary ? 'Speichern' : 'Vokabeln bearbeiten' }}
+            </button>
+            <input :key="4" type="text" v-if="addingVocabulary" v-model="newVocabulary.lang1" @keyup.enter="addVocabulary()" :placeholder="activeDictionary.lang1">
+            <input :key="5" type="text" v-if="addingVocabulary" v-model="newVocabulary.lang2" @keyup.enter="addVocabulary()" :placeholder="activeDictionary.lang2">
+            <input :key="6" type="text" v-if="addingVocabulary" v-model="newVocabulary.note" @keyup.enter="addVocabulary()" placeholder="Notiz">
+            <input :key="7" type="text" v-if="addingVocabulary" v-model="newVocabulary.category" @keyup.enter="addVocabulary()" placeholder="Kategorie">
+            <button :key="8" v-if="addingVocabulary" v-on:click="addVocabulary()">
                 <i class="material-icons">save</i> Speichern
             </button>
         </transition-group>
@@ -24,18 +27,24 @@
                     <th style="width:25%">Kategorie</th>
                 </tr>
                 <tr v-if="search">
-                    <th style="width:25%"><input type="text" v-model="query.lang1" :placeholder="activeDictionary.lang1" autofocus></th>
+                    <th style="width:25%"><input type="text" v-model="query.lang1" :placeholder="activeDictionary.lang1"></th>
                     <th style="width:25%"><input type="text" v-model="query.lang2" :placeholder="activeDictionary.lang2"></th>
                     <th style="width:25%"><input type="text" v-model="query.note" placeholder="Notiz"></th>
                     <th style="width:25%"><input type="text" v-model="query.category" placeholder="Kategorie"></th>
                 </tr>
             </thead>
             <tbody>
-                <tr :key="index" v-for="(vocabulary, index) in filteredVocabularies">
+                <tr v-if="!editingVocabulary" :key="index" v-for="(vocabulary, index) in filteredVocabularies">
                     <td>{{ vocabulary.lang1 }}</td>
                     <td>{{ vocabulary.lang2 }}</td>
                     <td>{{ vocabulary.note }}</td>
                     <td>{{ vocabulary.category }}</td>
+                </tr>
+                <tr v-if="editingVocabulary" :key="index" v-for="(vocabulary, index) in filteredVocabularies">
+                    <td><input type="text" v-model="vocabulary.lang1" :placeholder="activeDictionary.lang1"></td>
+                    <td><input type="text" v-model="vocabulary.lang2" :placeholder="activeDictionary.lang2"></td>
+                    <td><input type="text" v-model="vocabulary.note" placeholder="Notiz"></td>
+                    <td><input type="text" v-model="vocabulary.category" placeholder="Kategorie"></td>
                 </tr>
             </tbody>
         </table>
@@ -51,6 +60,7 @@ export default {
             search: 'search',
             query: 'query',
             addingVocabulary: 'addingVocabulary',
+            editingVocabulary: 'editingVocabulary',
             newVocabulary: 'newVocabulary'
         }),
         ...mapGetters({
@@ -62,6 +72,18 @@ export default {
         ...mapActions({
             addVocabulary: 'addVocabulary'
         })
+    },
+    beforeMount() {
+        Mousetrap.bind('n', () => {
+            this.$store.commit('toggleAddingVocabulary')
+        })
+        Mousetrap.bind('b', () => this.$store.commit('toggleEditingVocabulary'))
+    },
+    beforeDestroy() {
+        Mousetrap.unbind('n')
+        Mousetrap.unbind('b')
     }
 }
 </script>
+
+<style src="../assets/css/editor.css"></style>

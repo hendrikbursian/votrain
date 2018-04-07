@@ -29,24 +29,45 @@ import { mapGetters, mapActions } from 'vuex'
 export default {
     computed: {
         ...mapGetters({
-            dictionaries: 'dictionaries',
+            dictionaries: 'dictionaries'
         }),
         activeDictionary: {
-            get () {
+            get() {
                 return this.$store.state.activeDictionary
             },
-            set (activeDictionary) {
+            set(activeDictionary) {
                 this.$store.commit('setActiveDictionary', activeDictionary)
             }
         }
-    },
-    methods: {
     }
 }
 </script>
 
-
+<style src="../../static/css/normalize.css"></style>
+<style src="../../static/css/fonts.css"></style>
+<style src="../../static/css/skeleton.css"></style>
 <style scoped>
+@keyframes heartbeat {
+    from {
+        color: #f53434;
+    }
+    to {
+        color: #a53638;
+    }
+}
+
+footer span {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+footer i {
+    padding: 0 2px;
+    font-size: 16px;
+    animation: heartbeat 1s infinite;
+    animation-direction: alternate;
+}
 #app {
     height: 100%;
     display: flex;

@@ -1,0 +1,47 @@
+.menu-bar {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 1em;
+}
+tbody tr.active {
+    background: #ddd;
+}
+tbody tr:hover {
+    background: #eee;
+    cursor: pointer;
+}
+
+th input[type='text'],
+td input[type='text'] {
+    width: 100%;
+    height: 24px;
+    padding: 0;
+    margin: 0;
+    border-left: 0;
+    border-right: 0;
+    border-left: 0;
+}
+
+.menu-bar input {
+    width: 20%;
+    margin-bottom: 0;
+}
+
+.menu-bar :last-child {
+    margin-right: 0;
+}
+
+button i {
+    margin-right: 8px;
+}
+
+.slideLeft-fade-enter-active,
+.slideLeft-fade-leave-active {
+    transition: all 0.33s ease;
+}
+
+.slideLeft-fade-enter,
+.slideLeft-fade-leave-to {
+    transform: translateX(-45px);
+    opacity: 0;
+}

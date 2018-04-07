@@ -2,34 +2,35 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 
 Vue.use(Vuex)
-var store = JSON.parse(localStorage.getItem('store'))
 
-if (!store) {
-    store = {
-        activeDictionary: -1,
-        dictionaries: [],
-        addingVocabulary: false,
-        addingDictionary: false,
-        search: false,
-        newVocabulary: {
-            lang1: '',
-            lang2: '',
-            note: '',
-            category: ''
-        },
-        newDictionary: {
-            lang1: '',
-            lang2: ''
-        },
-        query: {
-            lang1: '',
-            lang2: '',
-            note: '',
-            category: ''
-        }
-    }
-    saveState(store)
+const store = {
+    activeDictionary: -1,
+    dictionaries: [],
+    addingVocabulary: false,
+    addingDictionary: false,
+    editingDictionary: false,
+    editingVocabulary: false,
+    search: false,
+    newVocabulary: {
+        lang1: '',
+        lang2: '',
+        note: '',
+        category: ''
+    },
+    newDictionary: {
+        lang1: '',
+        lang2: ''
+    },
+    query: {
+        lang1: '',
+        lang2: '',
+        note: '',
+        category: ''
+    },
+
+    ...JSON.parse(localStorage.getItem('store')),
 }
+saveState(store)
 
 export default new Vuex.Store({
     state: store,
@@ -74,6 +75,7 @@ export default new Vuex.Store({
                         commit('addVocabularyToActiveDictionary')
                         commit('emptyNewVocabulary')
                         commit('toggleAddingVocabulary')
+                        saveState(state)
                         resolve()
                     } else {
                         alert('Das Wort ist bereits enthalten')
@@ -98,6 +100,7 @@ export default new Vuex.Store({
                             commit('setActiveDictionary', 0)
                         commit('emptyNewDictionary')
                         commit('toggleAddingDictionary')
+                        saveState(state)
                         resolve()
                     } else {
                         alert('Das Wörterbuch ist bereits enthalten')
@@ -126,7 +129,6 @@ export default new Vuex.Store({
                 lang2: state.newDictionary.lang2,
                 vocabularies: []
             })
-            saveState(state)
         },
         addVocabularyToActiveDictionary(state) {
             state.dictionaries
@@ -137,7 +139,6 @@ export default new Vuex.Store({
                     note: state.newVocabulary.note,
                     category: state.newVocabulary.category
                 })
-            saveState(state)
         },
         emptyNewDictionary(state) {
             Object.keys(state.newDictionary).forEach(
@@ -154,6 +155,12 @@ export default new Vuex.Store({
         },
         toggleAddingDictionary(state) {
             state.addingDictionary = !state.addingDictionary
+        },
+        toggleEditingDictionary(state) {
+            state.editingDictionary = !state.editingDictionary
+        },
+        toggleEditingVocabulary(state) {
+            state.editingVocabulary = !state.editingVocabulary
         },
         toggleSearch(state) {
             state.search = !state.search

@@ -10,32 +10,7 @@
       require('module').globalPaths.push('<%= htmlWebpackPlugin.options.nodeModules.replace(/\\/g, '\\\\') %>')
     </script>
     <% } %>
-      <link rel="stylesheet" href="static/css/normalize.css"></link>
-      <link rel="stylesheet" href="static/css/fonts.css"></link>
-      <link rel="stylesheet" href="static/css/skeleton.css"></link>
-      <style>
-        @keyframes heartbeat {
-          from {
-            color: #f53434;
-          }
-          to {
-            color: #a53638;
-          }
-        }
-
-        footer span {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-
-        footer i {
-          padding: 0 2px;
-          font-size: 16px;
-          animation: heartbeat 1s infinite;
-          animation-direction: alternate;
-        }
-      </style>
+    <script src="static/js/mousetrap.min.js"></script>
 </head>
 
 <body>
