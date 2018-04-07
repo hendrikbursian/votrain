@@ -11,7 +11,7 @@
         </div>
         <nav>
             <router-link to="dictionaries">Wörterbücher</router-link>
-            <router-link to="vocabularies">Vokabeln</router-link>
+            <router-link v-if="activeDictionary !== -1" to="vocabularies">Vokabeln</router-link>
         </nav>
     </header>
     <main>

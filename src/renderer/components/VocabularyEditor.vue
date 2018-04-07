@@ -4,14 +4,14 @@
             <button :key="1" v-on:click="$store.commit('toggleSearch')">
                 <i class="material-icons">{{ search ? 'close' : 'search' }}</i>{{ search ? 'Abbrechen' : 'Suchen' }}
             </button>
-            <button :key="2" v-on:click="$store.commit('toggleEdit')">
-                <i class="material-icons">{{ edit ? 'close' : 'add' }}</i>{{ edit ? 'Abbrechen' : 'Wort hinzufügen' }}
+            <button :key="2" v-on:click="$store.commit('toggleAddingVocabulary')">
+                <i class="material-icons">{{ addingVocabulary ? 'close' : 'add' }}</i>{{ addingVocabulary ? 'Abbrechen' : 'Wort hinzufügen' }}
             </button>
-            <input :key="3" type="text" v-if="edit" v-model="newVocabulary.lang1" @keyup.enter="addVocabulary()" :placeholder="activeDictionary.lang1" autofocus>
-            <input :key="4" type="text" v-if="edit" v-model="newVocabulary.lang2" @keyup.enter="addVocabulary()" :placeholder="activeDictionary.lang2">
-            <input :key="5" type="text" v-if="edit" v-model="newVocabulary.note" @keyup.enter="addVocabulary()" placeholder="Notiz">
-            <input :key="6" type="text" v-if="edit" v-model="newVocabulary.category" @keyup.enter="addVocabulary()" placeholder="Kategorie">
-            <button :key="7" v-if="edit" v-on:click="addVocabulary()">
+            <input :key="3" type="text" v-if="addingVocabulary" v-model="newVocabulary.lang1" @keyup.enter="addVocabulary()" :placeholder="activeDictionary.lang1" autofocus>
+            <input :key="4" type="text" v-if="addingVocabulary" v-model="newVocabulary.lang2" @keyup.enter="addVocabulary()" :placeholder="activeDictionary.lang2">
+            <input :key="5" type="text" v-if="addingVocabulary" v-model="newVocabulary.note" @keyup.enter="addVocabulary()" placeholder="Notiz">
+            <input :key="6" type="text" v-if="addingVocabulary" v-model="newVocabulary.category" @keyup.enter="addVocabulary()" placeholder="Kategorie">
+            <button :key="7" v-if="addingVocabulary" v-on:click="addVocabulary()">
                 <i class="material-icons">save</i> Speichern
             </button>
         </transition-group>
@@ -48,9 +48,9 @@ import { mapGetters, mapState, mapActions } from 'vuex'
 export default {
     computed: {
         ...mapState({
-            edit: 'edit',
             search: 'search',
             query: 'query',
+            addingVocabulary: 'addingVocabulary',
             newVocabulary: 'newVocabulary'
         }),
         ...mapGetters({
@@ -65,69 +65,3 @@ export default {
     }
 }
 </script>
-
-<style scoped>
-button,
-.button {
-    cursor: pointer;
-    margin-bottom: 1rem;
-    outline: 0;
-    height: 2.5em;
-    white-space: nowrap;
-}
-
-.menu-bar {
-    display: flex;
-    flex-direction: row;
-    margin-bottom: 1em;
-}
-th {
-    height: 64px;
-}
-button,
-input {
-    display: inline-flex;
-    background-color: #fff;
-    justify-content: center;
-    align-items: center;
-    padding: 0 8px 0 2px;
-    margin: 0 8px 0 0;
-    border: 1px solid transparent;
-    border-bottom: 1px solid #888;
-    transition: all 1s ease;
-}
-
-.menu-bar input {
-    width: 20%;
-}
-
-.menu-bar :last-child {
-    margin-right: 0;
-}
-
-button i {
-    margin-right: 8px;
-}
-
-button:hover,
-input:hover {
-    border-bottom-color: #333;
-}
-
-button:focus,
-input:focus {
-    border: 1px solid transparent;
-    border-bottom: 1px solid #333;
-}
-
-.slideLeft-fade-enter-active,
-.slideLeft-fade-leave-active {
-    transition: all 0.33s ease;
-}
-
-.slideLeft-fade-enter,
-.slideLeft-fade-leave-to {
-    transform: translateX(-45px);
-    opacity: 0;
-}
-</style>

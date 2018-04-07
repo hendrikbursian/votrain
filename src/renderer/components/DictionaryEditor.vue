@@ -1,12 +1,12 @@
 <template>
     <div class="u-full-width">
         <transition-group tag="div" class="menu-bar u-full-width" name="slideLeft-fade">
-            <button :key="1" v-on:click="$store.commit('toggleEdit')">
-                <i class="material-icons">{{ edit ? 'close' : 'book' }}</i>{{ edit ? 'Abbrechen' : 'Wörterbuch hinzufügen' }}
+            <button :key="1" v-on:click="$store.commit('toggleAddingDictionary')">
+                <i class="material-icons">{{ addingDictionary ? 'close' : 'book' }}</i>{{ addingDictionary ? 'Abbrechen' : 'Wörterbuch hinzufügen' }}
             </button>
-            <input :key="2" type="text" v-if="edit" v-model="newDictionary.lang1" @keyup.enter="addDictionary()" placeholder="Sprache 1" autofocus>
-            <input :key="3" type="text" v-if="edit" v-model="newDictionary.lang2" @keyup.enter="addDictionary()" placeholder="Sprache 2">
-            <button :key="4" v-if="edit" v-on:click="addDictionary()">
+            <input :key="2" type="text" v-if="addingDictionary" v-model="newDictionary.lang1" @keyup.enter="addDictionary()" placeholder="Sprache 1" autofocus>
+            <input :key="3" type="text" v-if="addingDictionary" v-model="newDictionary.lang2" @keyup.enter="addDictionary()" placeholder="Sprache 2">
+            <button :key="4" v-if="addingDictionary" v-on:click="addDictionary()">
                 <i class="material-icons">save</i> Speichern
             </button>
         </transition-group>
@@ -19,7 +19,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr v-on:click="$store.commit('setActiveDictionary', dictionary.id); $router.push('vocabularies')" :key="index" v-for="(dictionary, index) in dictionaries">
+                <tr v-bind:class="{active: dictionary.id === activeDictionary}" v-on:click="$store.commit('setActiveDictionary', dictionary.id); $router.push('vocabularies')" :key="index" v-for="(dictionary, index) in dictionaries">
                     <td>{{ dictionary.lang1 }}</td>
                     <td>{{ dictionary.lang2 }}</td>
                     <td>{{ dictionary.vocabularies.length }}</td>
@@ -35,11 +35,12 @@ import { mapGetters, mapState, mapActions } from 'vuex'
 export default {
     computed: {
         ...mapState({
-            edit: 'edit',
-            newDictionary: 'newDictionary'
+            addingDictionary: 'addingDictionary',
+            newDictionary: 'newDictionary',
+            activeDictionary: 'activeDictionary'
         }),
         ...mapGetters({
-            dictionaries: 'dictionaries'
+            dictionaries: 'dictionaries',
         })
     },
     methods: {
@@ -47,20 +48,10 @@ export default {
             addDictionary: 'addDictionary'
         })
     }
-
 }
 </script>
 
-<style scoped>
-button,
-.button {
-    cursor: pointer;
-    margin-bottom: 1rem;
-    outline: 0;
-    height: 2.5em;
-    white-space: nowrap;
-}
-
+<style>
 .menu-bar {
     display: flex;
     flex-direction: row;
@@ -69,21 +60,12 @@ button,
 th {
     height: 64px;
 }
-tbody tr:hover {
-    background: #efefef;
-    cursor: pointer;
+tbody tr.active {
+    background: #ddd;
 }
-button,
-input {
-    display: inline-flex;
-    background-color: #fff;
-    justify-content: center;
-    align-items: center;
-    padding: 0 8px 0 2px;
-    margin: 0 8px 0 0;
-    border: 1px solid transparent;
-    border-bottom: 1px solid #888;
-    transition: all 1s ease;
+tbody tr:hover {
+    background: #eee;
+    cursor: pointer;
 }
 
 .menu-bar input {
@@ -96,17 +78,6 @@ input {
 
 button i {
     margin-right: 8px;
-}
-
-button:hover,
-input:hover {
-    border-bottom-color: #333;
-}
-
-button:focus,
-input:focus {
-    border: 1px solid transparent;
-    border-bottom: 1px solid #333;
 }
 
 .slideLeft-fade-enter-active,

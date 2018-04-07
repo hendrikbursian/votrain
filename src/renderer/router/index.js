@@ -6,11 +6,6 @@ Vue.use(Router)
 export default new Router({
     routes: [
         {
-            path: '/',
-            name: 'home',
-            component: require('@/components/Home').default
-        },
-        {
             path: '/dictionaries',
             name: 'dictionaries',
             component: require('@/components/DictionaryEditor').default
@@ -22,7 +17,7 @@ export default new Router({
         },
         {
             path: '*',
-            redirect: '/'
+            redirect: '/dictionaries'
         }
     ]
 })

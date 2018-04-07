@@ -2,55 +2,14 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 
 Vue.use(Vuex)
+var store = JSON.parse(localStorage.getItem('store'))
 
-export default new Vuex.Store({
-    state: {
-        activeDictionary: 1,
-        dictionaries: [
-            {
-                id: 1,
-                lang1: 'Englisch',
-                lang2: 'Deutsch',
-                vocabularies: [
-                    {
-                        id: '0',
-                        lang1: 'nice',
-                        lang2: 'nett',
-                        note: 'Ist meistens liebevoll gemeint',
-                        category: 'Adjektive'
-                    },
-                    {
-                        id: '1',
-                        lang1: 'bad',
-                        lang2: 'schlecht',
-                        note: 'Ist meistens negativ gemeint',
-                        category: 'Adjektive'
-                    }
-                ]
-            },
-            {
-                id: 2,
-                lang1: 'Spanisch',
-                lang2: 'Deutsch',
-                vocabularies: [
-                    {
-                        id: '0',
-                        lang1: 'bueno',
-                        lang2: 'gut',
-                        note: 'Ist meistens positiv gemeint',
-                        category: 'Adjektive'
-                    },
-                    {
-                        id: '1',
-                        lang1: 'noche',
-                        lang2: 'nacht',
-                        note: 'Kommt nach dem Abend',
-                        category: 'Subjektive'
-                    }
-                ]
-            }
-        ],
-        edit: false,
+if (!store) {
+    store = {
+        activeDictionary: -1,
+        dictionaries: [],
+        addingVocabulary: false,
+        addingDictionary: false,
         search: false,
         newVocabulary: {
             lang1: '',
@@ -68,8 +27,12 @@ export default new Vuex.Store({
             note: '',
             category: ''
         }
-    },
+    }
+    saveState(store)
+}
 
+export default new Vuex.Store({
+    state: store,
     getters: {
         dictionaries(state) {
             return state.dictionaries
@@ -110,7 +73,7 @@ export default new Vuex.Store({
                     ) {
                         commit('addVocabularyToActiveDictionary')
                         commit('emptyNewVocabulary')
-                        commit('toggleEdit')
+                        commit('toggleAddingVocabulary')
                         resolve()
                     } else {
                         alert('Das Wort ist bereits enthalten')
@@ -131,14 +94,18 @@ export default new Vuex.Store({
                         )
                     ) {
                         commit('addDictionary')
+                        if (state.activeDictionary === -1)
+                            commit('setActiveDictionary', 0)
                         commit('emptyNewDictionary')
-                        commit('toggleEdit')
+                        commit('toggleAddingDictionary')
                         resolve()
                     } else {
                         alert('Das Wörterbuch ist bereits enthalten')
                     }
                 } else {
-                    alert('Das Wörterbuch enthält nicht alle erforderlichen Angaben.')
+                    alert(
+                        'Das Wörterbuch enthält nicht alle erforderlichen Angaben.'
+                    )
                 }
             })
         }
@@ -150,11 +117,16 @@ export default new Vuex.Store({
         },
         addDictionary(state) {
             state.dictionaries.push({
-                id: state.dictionaries[state.dictionaries.length-1].id + 1,
+                id:
+                    state.dictionaries.length > 0
+                        ? state.dictionaries[state.dictionaries.length - 1].id +
+                          1
+                        : 0,
                 lang1: state.newDictionary.lang1,
                 lang2: state.newDictionary.lang2,
                 vocabularies: []
             })
+            saveState(state)
         },
         addVocabularyToActiveDictionary(state) {
             state.dictionaries
@@ -165,6 +137,7 @@ export default new Vuex.Store({
                     note: state.newVocabulary.note,
                     category: state.newVocabulary.category
                 })
+            saveState(state)
         },
         emptyNewDictionary(state) {
             Object.keys(state.newDictionary).forEach(
@@ -176,11 +149,18 @@ export default new Vuex.Store({
                 key => (state.newVocabulary[key] = '')
             )
         },
-        toggleEdit(state) {
-            state.edit = !state.edit
+        toggleAddingVocabulary(state) {
+            state.addingVocabulary = !state.addingVocabulary
+        },
+        toggleAddingDictionary(state) {
+            state.addingDictionary = !state.addingDictionary
         },
         toggleSearch(state) {
             state.search = !state.search
         }
     }
 })
+
+function saveState(state) {
+    localStorage.setItem('store', JSON.stringify(state))
+}
