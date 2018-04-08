@@ -87,7 +87,7 @@ export default new Vuex.Store({
             commit('setAddingVocabulary', false)
             commit('setEditingVocabulary', false)
         },
-        addVocabulary({ commit, getters, state }) {
+        addVocabulary({ commit, dispatch, getters, state }) {
             return new Promise((resolve, reject) => {
                 if (
                     state.newVocabulary.lang1 &&
@@ -103,7 +103,7 @@ export default new Vuex.Store({
                     ) {
                         commit('addVocabularyToActiveDictionary')
                         commit('emptyNewVocabulary')
-                        commit('toggleAddingVocabulary')
+                        dispatch('toggleAddingVocabulary')
                         saveState(state)
                         resolve()
                     } else {

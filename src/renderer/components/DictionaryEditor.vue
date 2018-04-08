@@ -1,5 +1,5 @@
 <template>
-    <div class="u-full-width">
+    <div>
         <transition-group tag="div" class="menu-bar u-full-width" name="slideLeft-fade">
             <button :key="1" v-on:click="toggleAddingDictionary()">
                 <i class="material-icons">{{ addingDictionary ? 'close' : 'book' }}</i> {{ addingDictionary ? 'Abbrechen' : 'Wörterbuch hinzufügen' }}
@@ -54,6 +54,7 @@ export default {
     },
     methods: {
         ...mapActions({
+            addDictionary: 'addDictionary',
             setActiveDictionary: 'setActiveDictionary',
             toggleAddingDictionary: 'toggleAddingDictionary',
             toggleEditingDictionary: 'toggleEditingDictionary'

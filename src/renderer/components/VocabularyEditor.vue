@@ -1,5 +1,5 @@
 <template>
-    <div class="u-full-width">
+    <div>
         <transition-group tag="div" class="menu-bar u-full-width" name="slideLeft-fade">
             <button :key="1" v-on:click="toggleFilter()">
                 <i class="material-icons">{{ filter ? 'close' : 'filter_list' }}</i> {{ filter ? 'Abbrechen' : 'Filtern' }}
@@ -41,10 +41,10 @@
                     <td>{{ vocabulary.category }}</td>
                 </tr>
                 <tr v-if="editingVocabulary" :key="index" v-for="(vocabulary, index) in filteredVocabularies">
-                    <td><input type="text" v-model="vocabulary.lang1" :placeholder="activeDictionary.lang1"></td>
-                    <td><input type="text" v-model="vocabulary.lang2" :placeholder="activeDictionary.lang2"></td>
-                    <td><input type="text" v-model="vocabulary.note" placeholder="Notiz"></td>
-                    <td><input type="text" v-model="vocabulary.category" placeholder="Kategorie"></td>
+                    <td><input type="text" v-model="vocabulary.lang1" @keyup.enter="toggleEditingVocabulary()" :placeholder="activeDictionary.lang1"></td>
+                    <td><input type="text" v-model="vocabulary.lang2" @keyup.enter="toggleEditingVocabulary()" :placeholder="activeDictionary.lang2"></td>
+                    <td><input type="text" v-model="vocabulary.note" @keyup.enter="toggleEditingVocabulary()" placeholder="Notiz"></td>
+                    <td><input type="text" v-model="vocabulary.category" @keyup.enter="toggleEditingVocabulary()" placeholder="Kategorie"></td>
                 </tr>
             </tbody>
         </table>
@@ -74,7 +74,6 @@ export default {
             toggleAddingVocabulary: 'toggleAddingVocabulary',
             toggleEditingVocabulary: 'toggleEditingVocabulary',
             toggleFilter: 'toggleFilter'
-
         })
     },
     beforeMount() {

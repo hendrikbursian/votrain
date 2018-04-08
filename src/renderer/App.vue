@@ -12,10 +12,13 @@
         <nav>
             <router-link to="dictionaries">Wörterbücher</router-link>
             <router-link v-if="activeDictionary !== -1" to="vocabularies">Vokabeln</router-link>
+            <router-link v-if="activeDictionary !== -1" to="vocabularies">Lernen</router-link>
         </nav>
     </header>
     <main>
-      <router-view></router-view>
+        <div class="display u-full-width">
+          <router-view></router-view>
+        </div>
     </main>
     <footer>
       <span>Crafted with <i class="material-icons">favorite</i> by <a href="https://hendrikbursian.github.io">Hendrik Bursian</a></span>
@@ -24,7 +27,7 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex'
+import { mapGetters } from 'vuex'
 
 export default {
     computed: {
@@ -39,6 +42,12 @@ export default {
                 this.$store.commit('setActiveDictionary', activeDictionary)
             }
         }
+    },
+    created() {
+        if (this.activeDictionary === -1)
+            alert(
+                'Bevor du loslegen kannst brauchst du ein Wörterbuch. Klicke auf "Wörterbuch hinzufügen" um ein Neues anzulegen.'
+            )
     }
 }
 </script>
@@ -56,26 +65,19 @@ export default {
     }
 }
 
-footer span {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-footer i {
-    padding: 0 2px;
-    font-size: 16px;
-    animation: heartbeat 1s infinite;
-    animation-direction: alternate;
-}
 #app {
     height: 100%;
     display: flex;
     flex-direction: column;
 }
 header {
-    flex: 8%;
-    padding: 1em 1em 0;
+    position: fixed;
+    background: #fff;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6em;
+    padding: 1em;
 }
 .top-bar {
     display: flex;
@@ -107,9 +109,29 @@ main {
     flex-direction: column;
     align-items: center;
 }
+.display {
+    padding: 8em 0 2.6em;
+}
 footer {
-    flex: 10%;
+    position: fixed;
+    background: #fff;
+    height: 2.6em;
+    left: 0;
+    right: 0;
+    bottom: 0;
     display: flex;
     justify-content: center;
+}
+footer span {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+footer i {
+    padding: 0 2px;
+    font-size: 16px;
+    animation: heartbeat 1s infinite;
+    animation-direction: alternate;
 }
 </style>

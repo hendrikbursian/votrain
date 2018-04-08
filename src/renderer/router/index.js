@@ -16,6 +16,11 @@ export default new Router({
             component: require('@/components/VocabularyEditor').default
         },
         {
+            path: '/learning',
+            name: 'learning',
+            component: require('@/components/Learning').default
+        },
+        {
             path: '*',
             redirect: '/dictionaries'
         }
