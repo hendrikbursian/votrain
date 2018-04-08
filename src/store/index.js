@@ -58,6 +58,9 @@ export default new Vuex.Store({
     },
 
     actions: {
+        toggleFilter({ commit }) {
+            commit('toggleFilter')
+        },
         toggleAddingDictionary({ commit, dispatch, state }) {
             let b = !state.addingDictionary
             dispatch('closeMenus')
@@ -137,6 +140,9 @@ export default new Vuex.Store({
                     )
                 }
             })
+        },
+        setActiveDictionary({ commit }, dictionaryId) {
+            commit('setActiveDictionary', dictionaryId)
         }
     },
 

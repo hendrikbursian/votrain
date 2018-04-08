@@ -4,7 +4,7 @@
             <button :key="1" v-on:click="toggleAddingDictionary()">
                 <i class="material-icons">{{ addingDictionary ? 'close' : 'book' }}</i> {{ addingDictionary ? 'Abbrechen' : 'Wörterbuch hinzufügen' }}
             </button>
-            <button :key="2" v-on:click="toggleEditingDictionary()">
+            <button :key="2" v-if="!addingDictionary" v-on:click="toggleEditingDictionary()">
                 <i class="material-icons">{{ editingDictionary ? 'save' : 'edit' }}</i> {{ editingDictionary ? 'Speichern' : 'Wörterbücher bearbeiten' }}
             </button>
             <input :key="3" type="text" v-if="addingDictionary" v-model="newDictionary.lang1" @keyup.esc="toggleAddingDictionary()" @keyup.enter="addDictionary()" placeholder="Sprache 1">
@@ -22,7 +22,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr v-if="!editingDictionary" v-bind:class="{active: dictionary.id === activeDictionary}" v-on:click="$store.commit('setActiveDictionary', dictionary.id); $router.push('vocabularies')" :key="index" v-for="(dictionary, index) in dictionaries">
+                <tr v-if="!editingDictionary" v-bind:class="{active: dictionary.id === activeDictionary}" v-on:click="setActiveDictionary(dictionary.id); $router.push('vocabularies')" :key="index" v-for="(dictionary, index) in dictionaries">
                     <td>{{ dictionary.lang1 }}</td>
                     <td>{{ dictionary.lang2 }}</td>
                     <td>{{ dictionary.vocabularies.length }}</td>
@@ -54,6 +54,7 @@ export default {
     },
     methods: {
         ...mapActions({
+            setActiveDictionary: 'setActiveDictionary',
             toggleAddingDictionary: 'toggleAddingDictionary',
             toggleEditingDictionary: 'toggleEditingDictionary'
         })

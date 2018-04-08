@@ -1,13 +1,13 @@
 <template>
     <div class="u-full-width">
         <transition-group tag="div" class="menu-bar u-full-width" name="slideLeft-fade">
-            <button :key="1" v-on:click="$store.commit('toggleFilter')">
+            <button :key="1" v-on:click="toggleFilter()">
                 <i class="material-icons">{{ filter ? 'close' : 'filter_list' }}</i> {{ filter ? 'Abbrechen' : 'Filtern' }}
             </button>
             <button :key="2" v-on:click="toggleAddingVocabulary()">
                 <i class="material-icons">{{ addingVocabulary ? 'close' : 'add' }}</i> {{ addingVocabulary ? 'Abbrechen' : 'Wort hinzufügen' }}
             </button>
-            <button :key="3" v-on:click="toggleEditingVocabulary()">
+            <button :key="3" v-if="!addingVocabulary" v-on:click="toggleEditingVocabulary()">
                 <i class="material-icons">{{ editingVocabulary ? 'save' : 'edit' }}</i> {{ editingVocabulary ? 'Speichern' : 'Vokabeln bearbeiten' }}
             </button>
             <input :key="4" type="text" v-if="addingVocabulary" v-model="newVocabulary.lang1" @keyup.enter="addVocabulary()" :placeholder="activeDictionary.lang1">
@@ -72,13 +72,15 @@ export default {
         ...mapActions({
             addVocabulary: 'addVocabulary',
             toggleAddingVocabulary: 'toggleAddingVocabulary',
-            toggleEditingVocabulary: 'toggleEditingVocabulary'
+            toggleEditingVocabulary: 'toggleEditingVocabulary',
+            toggleFilter: 'toggleFilter'
 
         })
     },
     beforeMount() {
         Mousetrap.bind('n', () => this.toggleAddingVocabulary())
         Mousetrap.bind('b', () => this.toggleEditingVocabulary())
+        Mousetrap.bind('f', () => this.toggleFilter())
     }
 }
 </script>
