@@ -4,10 +4,10 @@
             <button :key="1" v-on:click="$store.commit('toggleFilter')">
                 <i class="material-icons">{{ filter ? 'close' : 'filter_list' }}</i> {{ filter ? 'Abbrechen' : 'Filtern' }}
             </button>
-            <button :key="2" v-on:click="$store.commit('toggleAddingVocabulary')">
+            <button :key="2" v-on:click="toggleAddingVocabulary()">
                 <i class="material-icons">{{ addingVocabulary ? 'close' : 'add' }}</i> {{ addingVocabulary ? 'Abbrechen' : 'Wort hinzufügen' }}
             </button>
-            <button :key="3" v-on:click="$store.commit('toggleEditingVocabulary')">
+            <button :key="3" v-on:click="toggleEditingVocabulary()">
                 <i class="material-icons">{{ editingVocabulary ? 'save' : 'edit' }}</i> {{ editingVocabulary ? 'Speichern' : 'Vokabeln bearbeiten' }}
             </button>
             <input :key="4" type="text" v-if="addingVocabulary" v-model="newVocabulary.lang1" @keyup.enter="addVocabulary()" :placeholder="activeDictionary.lang1">
@@ -70,12 +70,15 @@ export default {
     },
     methods: {
         ...mapActions({
-            addVocabulary: 'addVocabulary'
+            addVocabulary: 'addVocabulary',
+            toggleAddingVocabulary: 'toggleAddingVocabulary',
+            toggleEditingVocabulary: 'toggleEditingVocabulary'
+
         })
     },
     beforeMount() {
-        Mousetrap.bind('n', () => this.$store.commit('toggleAddingVocabulary'))
-        Mousetrap.bind('b', () => this.$store.commit('toggleEditingVocabulary'))
+        Mousetrap.bind('n', () => this.toggleAddingVocabulary())
+        Mousetrap.bind('b', () => this.toggleEditingVocabulary())
     }
 }
 </script>

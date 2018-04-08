@@ -28,7 +28,7 @@ const store = {
         category: ''
     },
 
-    ...JSON.parse(localStorage.getItem('store')),
+    ...JSON.parse(localStorage.getItem('store'))
 }
 saveState(store)
 
@@ -58,6 +58,32 @@ export default new Vuex.Store({
     },
 
     actions: {
+        toggleAddingDictionary({ commit, dispatch, state }) {
+            let b = !state.addingDictionary
+            dispatch('closeMenus')
+            commit('setAddingDictionary', b)
+        },
+        toggleEditingDictionary({ commit, dispatch, state }) {
+            let b = !state.editingDictionary
+            dispatch('closeMenus')
+            commit('setEditingDictionary', b)
+        },
+        toggleAddingVocabulary({ commit, dispatch, state }) {
+            let b = !state.addingVocabulary
+            dispatch('closeMenus')
+            commit('setAddingVocabulary', b)
+        },
+        toggleEditingVocabulary({ commit, dispatch, state }) {
+            let b = !state.editingVocabulary
+            dispatch('closeMenus')
+            commit('setEditingVocabulary', b)
+        },
+        closeMenus({ commit, state }) {
+            commit('setAddingDictionary', false)
+            commit('setEditingDictionary', false)
+            commit('setAddingVocabulary', false)
+            commit('setEditingVocabulary', false)
+        },
         addVocabulary({ commit, getters, state }) {
             return new Promise((resolve, reject) => {
                 if (
@@ -150,17 +176,17 @@ export default new Vuex.Store({
                 key => (state.newVocabulary[key] = '')
             )
         },
-        toggleAddingVocabulary(state) {
-            state.addingVocabulary = !state.addingVocabulary
+        setAddingVocabulary(state, payload) {
+            state.addingVocabulary = payload
         },
-        toggleAddingDictionary(state) {
-            state.addingDictionary = !state.addingDictionary
+        setAddingDictionary(state, payload) {
+            state.addingDictionary = payload
         },
-        toggleEditingDictionary(state) {
-            state.editingDictionary = !state.editingDictionary
+        setEditingDictionary(state, payload) {
+            state.editingDictionary = payload
         },
-        toggleEditingVocabulary(state) {
-            state.editingVocabulary = !state.editingVocabulary
+        setEditingVocabulary(state, payload) {
+            state.editingVocabulary = payload
         },
         toggleFilter(state) {
             state.filter = !state.filter

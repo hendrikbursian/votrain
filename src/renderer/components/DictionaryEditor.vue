@@ -1,14 +1,14 @@
 <template>
     <div class="u-full-width">
         <transition-group tag="div" class="menu-bar u-full-width" name="slideLeft-fade">
-            <button :key="1" v-on:click="$store.commit('toggleAddingDictionary')">
+            <button :key="1" v-on:click="toggleAddingDictionary()">
                 <i class="material-icons">{{ addingDictionary ? 'close' : 'book' }}</i> {{ addingDictionary ? 'Abbrechen' : 'Wörterbuch hinzufügen' }}
             </button>
-            <button :key="2" v-on:click="$store.commit('toggleEditingDictionary')">
+            <button :key="2" v-on:click="toggleEditingDictionary()">
                 <i class="material-icons">{{ editingDictionary ? 'save' : 'edit' }}</i> {{ editingDictionary ? 'Speichern' : 'Wörterbücher bearbeiten' }}
             </button>
-            <input :key="3" type="text" v-if="addingDictionary" v-model="newDictionary.lang1" @keyup.esc="$store.commit('toggleAddingDictionary')" @keyup.enter="addDictionary()" placeholder="Sprache 1">
-            <input :key="4" type="text" v-if="addingDictionary" v-model="newDictionary.lang2" @keyup.esc="$store.commit('toggleAddingDictionary')" @keyup.enter="addDictionary()" placeholder="Sprache 2">
+            <input :key="3" type="text" v-if="addingDictionary" v-model="newDictionary.lang1" @keyup.esc="toggleAddingDictionary()" @keyup.enter="addDictionary()" placeholder="Sprache 1">
+            <input :key="4" type="text" v-if="addingDictionary" v-model="newDictionary.lang2" @keyup.esc="toggleAddingDictionary()" @keyup.enter="addDictionary()" placeholder="Sprache 2">
             <button :key="5" v-if="addingDictionary" v-on:click="addDictionary()">
                 <i class="material-icons">save</i> Speichern
             </button>
@@ -28,8 +28,8 @@
                     <td>{{ dictionary.vocabularies.length }}</td>
                 </tr>
                 <tr v-if="editingDictionary" v-bind:class="{active: dictionary.id === activeDictionary}" :key="index" v-for="(dictionary, index) in dictionaries">
-                    <td><input type="text" v-model="dictionary.lang1" @keyup.enter="$store.commit('toggleEditingDictionary')" placeholder="Sprache 1" /></td>
-                    <td><input type="text" v-model="dictionary.lang2" @keyup.enter="$store.commit('toggleEditingDictionary')" placeholder="Sprache 2" /></td>
+                    <td><input type="text" v-model="dictionary.lang1" @keyup.enter="toggleEditingDictionary()" placeholder="Sprache 1" /></td>
+                    <td><input type="text" v-model="dictionary.lang2" @keyup.enter="toggleEditingDictionary()" placeholder="Sprache 2" /></td>
                     <td>{{ dictionary.vocabularies.length }}</td>
                 </tr>
             </tbody>
@@ -54,12 +54,13 @@ export default {
     },
     methods: {
         ...mapActions({
-            addDictionary: 'addDictionary'
+            toggleAddingDictionary: 'toggleAddingDictionary',
+            toggleEditingDictionary: 'toggleEditingDictionary'
         })
     },
     beforeMount() {
-        Mousetrap.bind('n', () => this.$store.commit('toggleAddingDictionary'))
-        Mousetrap.bind('b', () => this.$store.commit('toggleEditingDictionary'))
+        Mousetrap.bind('n', () => this.toggleAddingDictionary())
+        Mousetrap.bind('b', () => this.toggleEditingDictionary())
     }
 }
 </script>
