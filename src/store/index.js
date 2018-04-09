@@ -4,7 +4,7 @@ import Vuex from 'vuex'
 Vue.use(Vuex)
 
 const store = {
-    activeDictionary: -1,
+    activeDictionaryId: -1,
     dictionaries: [],
     addingVocabulary: false,
     addingDictionary: false,
@@ -34,13 +34,14 @@ saveState(store)
 
 export default new Vuex.Store({
     state: store,
+    strict: true,
     getters: {
         dictionaries(state) {
             return state.dictionaries
         },
         activeDictionary(state) {
             return state.dictionaries.find(
-                dictionary => dictionary.id === state.activeDictionary
+                dictionary => dictionary.id === state.activeDictionaryId
             )
         },
         filteredVocabularies(state, getters) {
@@ -126,9 +127,9 @@ export default new Vuex.Store({
                     ) {
                         commit('addDictionary')
                         if (state.activeDictionary === -1)
-                            commit('setActiveDictionary', 0)
+                            commit('setActiveDictionaryId', 0)
                         commit('emptyNewDictionary')
-                        commit('toggleAddingDictionary')
+                        commit('setAddingDictionary', false)
                         saveState(state)
                         resolve()
                     } else {
@@ -141,14 +142,15 @@ export default new Vuex.Store({
                 }
             })
         },
-        setActiveDictionary({ commit }, dictionaryId) {
-            commit('setActiveDictionary', dictionaryId)
+        setActiveDictionaryId({ commit, state }, dictionaryId) {
+            commit('setActiveDictionaryId', dictionaryId)
+            saveState(state)
         }
     },
 
     mutations: {
-        setActiveDictionary(state, dictionaryId) {
-            state.activeDictionary = dictionaryId
+        setActiveDictionaryId(state, dictionaryId) {
+            state.activeDictionaryId = dictionaryId
         },
         addDictionary(state) {
             state.dictionaries.push({
@@ -162,15 +164,13 @@ export default new Vuex.Store({
                 vocabularies: []
             })
         },
-        addVocabularyToActiveDictionary(state) {
-            state.dictionaries
-                .find(dictionary => dictionary.id === state.activeDictionary)
-                .vocabularies.push({
-                    lang1: state.newVocabulary.lang1,
-                    lang2: state.newVocabulary.lang2,
-                    note: state.newVocabulary.note,
-                    category: state.newVocabulary.category
-                })
+        addVocabularyToActiveDictionary({ state, getters }) {
+            getters.activeDictionary.vocabularies.push({
+                lang1: state.newVocabulary.lang1,
+                lang2: state.newVocabulary.lang2,
+                note: state.newVocabulary.note,
+                category: state.newVocabulary.category
+            })
         },
         emptyNewDictionary(state) {
             Object.keys(state.newDictionary).forEach(

@@ -3,7 +3,7 @@
     <header>
         <div class="top-bar">
             <h1>Votrain</h1>
-            <select v-model="activeDictionary">
+            <select v-model="activeDictionaryId">
                 <option v-for="dictionary in dictionaries" :value="dictionary.id" :key="dictionary.id">
                     {{ dictionary.lang1 }} / {{ dictionary.lang2 }}
                 </option>
@@ -11,8 +11,9 @@
         </div>
         <nav>
             <router-link to="dictionaries">Wörterbücher</router-link>
-            <router-link v-if="activeDictionary !== -1" to="vocabularies">Vokabeln</router-link>
-            <router-link v-if="activeDictionary !== -1" to="vocabularies">Lernen</router-link>
+            <router-link v-if="activeDictionaryId !== -1" to="vocabularies">Vokabeln</router-link>
+            <router-link v-if="activeDictionaryId !== -1 && filteredVocabularies.length > 0" to="boxes">Karteikasten</router-link>
+            <router-link v-if="activeDictionaryId !== -1" to="vocabularies">Lernen</router-link>
         </nav>
     </header>
     <main>
@@ -27,24 +28,30 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 
 export default {
     computed: {
         ...mapGetters({
-            dictionaries: 'dictionaries'
+            dictionaries: 'dictionaries',
+            filteredVocabularies: 'filteredVocabularies'
         }),
-        activeDictionary: {
+        activeDictionaryId: {
             get() {
-                return this.$store.state.activeDictionary
+                return this.$store.state.activeDictionaryId
             },
-            set(activeDictionary) {
-                this.$store.commit('setActiveDictionary', activeDictionary)
+            set(activeDictionaryId) {
+                this.setActiveDictionaryId(activeDictionaryId)
             }
         }
     },
+    methods: {
+        ...mapActions({
+            setActiveDictionaryId:'setActiveDictionaryId'
+        })
+    },
     created() {
-        if (this.activeDictionary === -1)
+        if (this.activeDictionaryId === -1)
             alert(
                 'Bevor du loslegen kannst brauchst du ein Wörterbuch. Klicke auf "Wörterbuch hinzufügen" um ein Neues anzulegen.'
             )

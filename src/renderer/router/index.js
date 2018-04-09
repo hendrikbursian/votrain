@@ -16,6 +16,11 @@ export default new Router({
             component: require('@/components/VocabularyEditor').default
         },
         {
+            path: '/boxes',
+            name: 'boxes',
+            component: require('@/components/BoxEditor').default
+        },
+        {
             path: '/learning',
             name: 'learning',
             component: require('@/components/Learning').default
