@@ -11,16 +11,6 @@ const store = {
     editingDictionary: false,
     editingVocabulary: false,
     filter: false,
-    newVocabulary: {
-        lang1: '',
-        lang2: '',
-        note: '',
-        category: ''
-    },
-    newDictionary: {
-        lang1: '',
-        lang2: ''
-    },
     query: {
         lang1: '',
         lang2: '',
@@ -30,7 +20,6 @@ const store = {
 
     ...JSON.parse(localStorage.getItem('store'))
 }
-saveState(store)
 
 export default new Vuex.Store({
     state: store,
@@ -59,146 +48,131 @@ export default new Vuex.Store({
 
     actions: {
         toggleFilter({ commit }) {
-            commit('toggleFilter')
+            commit('TOGGLE_FILTER')
         },
         toggleAddingDictionary({ commit, dispatch, state }) {
             let b = !state.addingDictionary
             dispatch('closeMenus')
-            commit('setAddingDictionary', b)
+            commit('SET_ADDING_DICTIONARY', b)
         },
         toggleEditingDictionary({ commit, dispatch, state }) {
             let b = !state.editingDictionary
             dispatch('closeMenus')
-            commit('setEditingDictionary', b)
+            commit('SET_EDITIING_DICTIONARY', b)
         },
         toggleAddingVocabulary({ commit, dispatch, state }) {
             let b = !state.addingVocabulary
             dispatch('closeMenus')
-            commit('setAddingVocabulary', b)
+            commit('SET_ADDING_VOCABULARY', b)
         },
         toggleEditingVocabulary({ commit, dispatch, state }) {
             let b = !state.editingVocabulary
             dispatch('closeMenus')
-            commit('setEditingVocabulary', b)
+            commit('SET_EDITING_VOCABULARY', b)
         },
         closeMenus({ commit, state }) {
-            commit('setAddingDictionary', false)
-            commit('setEditingDictionary', false)
-            commit('setAddingVocabulary', false)
-            commit('setEditingVocabulary', false)
+            commit('SET_ADDING_DICTIONARY', false)
+            commit('SET_EDITIING_DICTIONARY', false)
+            commit('SET_ADDING_VOCABULARY', false)
+            commit('SET_EDITING_VOCABULARY', false)
         },
-        addVocabulary({ commit, dispatch, getters, state }) {
+        addVocabulary({ commit, dispatch, getters, state }, vocabulary) {
             return new Promise((resolve, reject) => {
                 if (
-                    state.newVocabulary.lang1 &&
-                    state.newVocabulary.lang2 &&
-                    state.newVocabulary.category
+                    vocabulary.lang1 &&
+                    vocabulary.lang2 &&
+                    vocabulary.category
                 ) {
                     if (
                         !getters.activeDictionary.vocabularies.find(
                             voc =>
-                                voc.lang1 == state.newVocabulary.lang1 ||
-                                voc.lang2 == state.newVocabulary.lang2
+                                voc.lang1 == vocabulary.lang1 ||
+                                voc.lang2 == vocabulary.lang2
                         )
                     ) {
-                        commit('addVocabularyToActiveDictionary')
-                        commit('emptyNewVocabulary')
+                        getters.activeDictionary.vocabularies.push({
+                            lang1: vocabulary.lang1,
+                            lang2: vocabulary.lang2,
+                            note: vocabulary.note,
+                            category: vocabulary.category
+                        })
+
                         dispatch('toggleAddingVocabulary')
-                        saveState(state)
+                        dispatch('saveState')
                         resolve()
                     } else {
-                        alert('Das Wort ist bereits enthalten')
+                        reject('Das Wort ist bereits enthalten')
                     }
                 } else {
-                    alert('Das Wort enthält nicht alle erforderlichen Angaben.')
+                    reject('Das Wort enthält nicht alle erforderlichen Angaben.')
                 }
             })
         },
-        addDictionary({ commit, getters, state }) {
+        addDictionary({ commit, dispatch, getters, state }, dictionary) {
             return new Promise((resolve, reject) => {
-                if (state.newDictionary.lang1 && state.newDictionary.lang2) {
+                if (dictionary.lang1 && dictionary.lang2) {
                     if (
                         !getters.dictionaries.find(
                             dic =>
-                                dic.lang1 == state.newDictionary.lang1 &&
-                                dic.lang2 == state.newDictionary.lang2
+                                dic.lang1 == dictionary.lang1 &&
+                                dic.lang2 == dictionary.lang2
                         )
                     ) {
-                        commit('addDictionary')
-                        if (state.activeDictionary === -1)
-                            commit('setActiveDictionaryId', 0)
-                        commit('emptyNewDictionary')
-                        commit('setAddingDictionary', false)
-                        saveState(state)
+                        commit('ADD_DICTIONARY', dictionary)
+                        if (state.activeDictionaryId === -1)
+                            commit('SET_ACTIVE_DICTIONARY_ID', 0)
+                        commit('SET_ADDING_DICTIONARY', false)
+                        dispatch('saveState')
                         resolve()
                     } else {
-                        alert('Das Wörterbuch ist bereits enthalten')
+                        reject('Das Wörterbuch ist bereits enthalten')
                     }
                 } else {
-                    alert(
+                    reject(
                         'Das Wörterbuch enthält nicht alle erforderlichen Angaben.'
                     )
                 }
             })
         },
-        setActiveDictionaryId({ commit, state }, dictionaryId) {
-            commit('setActiveDictionaryId', dictionaryId)
-            saveState(state)
+        setActiveDictionaryId({ commit, dispatch, state }, dictionaryId) {
+            commit('SET_ACTIVE_DICTIONARY_ID', dictionaryId)
+            dispatch('saveState')
+        },
+        saveState({ state }) {
+            localStorage.setItem('store', JSON.stringify(state))
         }
     },
 
     mutations: {
-        setActiveDictionaryId(state, dictionaryId) {
+        SET_ACTIVE_DICTIONARY_ID(state, dictionaryId) {
             state.activeDictionaryId = dictionaryId
         },
-        addDictionary(state) {
+        ADD_DICTIONARY(state, dictionary) {
             state.dictionaries.push({
                 id:
                     state.dictionaries.length > 0
                         ? state.dictionaries[state.dictionaries.length - 1].id +
                           1
                         : 0,
-                lang1: state.newDictionary.lang1,
-                lang2: state.newDictionary.lang2,
+                lang1: dictionary.lang1,
+                lang2: dictionary.lang2,
                 vocabularies: []
             })
         },
-        addVocabularyToActiveDictionary({ state, getters }) {
-            getters.activeDictionary.vocabularies.push({
-                lang1: state.newVocabulary.lang1,
-                lang2: state.newVocabulary.lang2,
-                note: state.newVocabulary.note,
-                category: state.newVocabulary.category
-            })
-        },
-        emptyNewDictionary(state) {
-            Object.keys(state.newDictionary).forEach(
-                key => (state.newDictionary[key] = '')
-            )
-        },
-        emptyNewVocabulary(state) {
-            Object.keys(state.newVocabulary).forEach(
-                key => (state.newVocabulary[key] = '')
-            )
-        },
-        setAddingVocabulary(state, payload) {
+        SET_ADDING_VOCABULARY(state, payload) {
             state.addingVocabulary = payload
         },
-        setAddingDictionary(state, payload) {
+        SET_ADDING_DICTIONARY(state, payload) {
             state.addingDictionary = payload
         },
-        setEditingDictionary(state, payload) {
+        SET_EDITIING_DICTIONARY(state, payload) {
             state.editingDictionary = payload
         },
-        setEditingVocabulary(state, payload) {
+        SET_EDITING_VOCABULARY(state, payload) {
             state.editingVocabulary = payload
         },
-        toggleFilter(state) {
+        TOGGLE_FILTER(state) {
             state.filter = !state.filter
         }
     }
 })
-
-function saveState(state) {
-    localStorage.setItem('store', JSON.stringify(state))
-}

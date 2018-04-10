@@ -10,11 +10,11 @@
             <button :key="3" v-if="!addingVocabulary" v-on:click="toggleEditingVocabulary()">
                 <i class="material-icons">{{ editingVocabulary ? 'save' : 'edit' }}</i> {{ editingVocabulary ? 'Speichern' : 'Vokabeln bearbeiten' }}
             </button>
-            <input :key="4" type="text" v-if="addingVocabulary" v-model="newVocabulary.lang1" @keyup.enter="addVocabulary()" :placeholder="activeDictionary.lang1">
-            <input :key="5" type="text" v-if="addingVocabulary" v-model="newVocabulary.lang2" @keyup.enter="addVocabulary()" :placeholder="activeDictionary.lang2">
-            <input :key="6" type="text" v-if="addingVocabulary" v-model="newVocabulary.note" @keyup.enter="addVocabulary()" placeholder="Notiz">
-            <input :key="7" type="text" v-if="addingVocabulary" v-model="newVocabulary.category" @keyup.enter="addVocabulary()" placeholder="Kategorie">
-            <button :key="8" v-if="addingVocabulary" v-on:click="addVocabulary()">
+            <input :key="4" type="text" v-if="addingVocabulary" v-model="newVocabulary.lang1" @keyup.enter="addNewVocabulary" :placeholder="activeDictionary.lang1">
+            <input :key="5" type="text" v-if="addingVocabulary" v-model="newVocabulary.lang2" @keyup.enter="addNewVocabulary" :placeholder="activeDictionary.lang2">
+            <input :key="6" type="text" v-if="addingVocabulary" v-model="newVocabulary.note" @keyup.enter="addNewVocabulary" placeholder="Notiz">
+            <input :key="7" type="text" v-if="addingVocabulary" v-model="newVocabulary.category" @keyup.enter="addNewVocabulary" placeholder="Kategorie">
+            <button :key="8" v-if="addingVocabulary" v-on:click="addNewVocabulary">
                 <i class="material-icons">save</i> Speichern
             </button>
         </transition-group>
@@ -54,14 +54,25 @@
 <script>
 import { mapGetters, mapState, mapActions } from 'vuex'
 
+let vocabulary = {
+    lang1: '',
+    lang2: '',
+    note: '',
+    category: ''
+}
+
 export default {
+    data: function() {
+        return {
+            newVocabulary: { ...vocabulary }
+        }
+    },
     computed: {
         ...mapState({
             filter: 'filter',
             query: 'query',
             addingVocabulary: 'addingVocabulary',
-            editingVocabulary: 'editingVocabulary',
-            newVocabulary: 'newVocabulary'
+            editingVocabulary: 'editingVocabulary'
         }),
         ...mapGetters({
             activeDictionary: 'activeDictionary',
@@ -69,6 +80,12 @@ export default {
         })
     },
     methods: {
+        addNewVocabulary() {
+            this.addVocabulary(this.newVocabulary)
+                .then(() => (this.newVocabulary = { ...vocabulary }))
+                .catch(alert)
+        },
+
         ...mapActions({
             addVocabulary: 'addVocabulary',
             toggleAddingVocabulary: 'toggleAddingVocabulary',
