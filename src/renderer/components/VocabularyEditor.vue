@@ -4,17 +4,23 @@
             <button :key="1" v-on:click="toggleFilter">
                 <i class="material-icons">{{ filterOn ? 'close' : 'filter_list' }}</i> {{ filterOn ? 'Abbrechen' : 'Filter' }}
             </button>
-            <button :key="2" v-on:click="toggleAddingVocabulary()">
+            <button :key="2" v-on:click="toggleAddingVocabulary">
                 <i class="material-icons">{{ addingVocabulary ? 'close' : 'add' }}</i> {{ addingVocabulary ? 'Abbrechen' : 'Neue Vokabel' }}
             </button>
-            <button :key="3" v-if="!addingVocabulary" v-on:click="toggleEditingVocabulary()">
-                <i class="material-icons">{{ editingVocabulary ? 'save' : 'edit' }}</i> {{ editingVocabulary ? 'Speichern' : 'Vokabeln bearbeiten' }}
+            <button :key="3" v-if="!addingVocabulary && !editingVocabulary" v-on:click="toggleEditingVocabulary">
+                <i class="material-icons">edit</i> Vokabeln bearbeiten
             </button>
-            <input :key="4" type="text" v-if="addingVocabulary" v-model="newVocabulary.lang1" @keyup.enter="addNewVocabulary" :placeholder="activeDictionary.lang1">
-            <input :key="5" type="text" v-if="addingVocabulary" v-model="newVocabulary.lang2" @keyup.enter="addNewVocabulary" :placeholder="activeDictionary.lang2">
-            <input :key="6" type="text" v-if="addingVocabulary" v-model="newVocabulary.note" @keyup.enter="addNewVocabulary" placeholder="Notiz">
-            <input :key="7" type="text" v-if="addingVocabulary" v-model="newVocabulary.category" @keyup.enter="addNewVocabulary" placeholder="Kategorie">
-            <button :key="8" v-if="addingVocabulary" v-on:click="addNewVocabulary">
+            <button :key="4" v-if="editingVocabulary" v-on:click="save">
+                <i class="material-icons">save</i> Speichern
+            </button>
+            <button :key="5" v-if="editingVocabulary" v-on:click="cancel">
+                <i class="material-icons">close</i> Abbrechen
+            </button>
+            <input :key="6" type="text" v-if="addingVocabulary" v-model="newVocabulary.lang1" @keyup.enter="addNewVocabulary" :placeholder="activeDictionary.lang1">
+            <input :key="7" type="text" v-if="addingVocabulary" v-model="newVocabulary.lang2" @keyup.enter="addNewVocabulary" :placeholder="activeDictionary.lang2">
+            <input :key="8" type="text" v-if="addingVocabulary" v-model="newVocabulary.note" @keyup.enter="addNewVocabulary" placeholder="Notiz">
+            <input :key="9" type="text" v-if="addingVocabulary" v-model="newVocabulary.category" @keyup.enter="addNewVocabulary" placeholder="Kategorie">
+            <button :key="10" v-if="addingVocabulary" v-on:click="addNewVocabulary">
                 <i class="material-icons">save</i> Speichern
             </button>
         </transition-group>
@@ -41,10 +47,10 @@
                     <td>{{ vocabulary.category }}</td>
                 </tr>
                 <tr v-if="editingVocabulary" :key="index" v-for="(vocabulary, index) in vocabularies">
-                    <td><input type="text" v-model="vocabulary.lang1" @keyup.enter="toggleEditingVocabulary()" :placeholder="activeDictionary.lang1"></td>
-                    <td><input type="text" v-model="vocabulary.lang2" @keyup.enter="toggleEditingVocabulary()" :placeholder="activeDictionary.lang2"></td>
-                    <td><input type="text" v-model="vocabulary.note" @keyup.enter="toggleEditingVocabulary()" placeholder="Notiz"></td>
-                    <td><input type="text" v-model="vocabulary.category" @keyup.enter="toggleEditingVocabulary()" placeholder="Kategorie"></td>
+                    <td><input type="text" v-model="vocabulary.lang1" @keyup.enter="save" @keyup.esc="cancel" :placeholder="activeDictionary.lang1"></td>
+                    <td><input type="text" v-model="vocabulary.lang2" @keyup.enter="save" @keyup.esc="cancel" :placeholder="activeDictionary.lang2"></td>
+                    <td><input type="text" v-model="vocabulary.note" @keyup.enter="save" @keyup.esc="cancel" placeholder="Notiz"></td>
+                    <td><input type="text" v-model="vocabulary.category" @keyup.enter="save" @keyup.esc="cancel" placeholder="Kategorie"></td>
                 </tr>
             </tbody>
         </table>
@@ -106,12 +112,24 @@ export default {
             this.addingVocabulary = false
             this.editingVocabulary = !this.editingVocabulary
         },
+        save() {
+            this.editingVocabulary = false
+            this.saveState()
+        },
+        cancel() {
+            this.editingVocabulary = false
+            this.reloadDictionaries()
+        },
 
         ...mapActions({
-            addVocabulary: 'addVocabulary'
+            addVocabulary: 'addVocabulary',
+            saveState: 'saveState',
+            reloadDictionaries: 'reloadDictionaries',
         })
     },
     beforeMount() {
+        // TODO: VUEX MIXTURE WITH RELOADING STATE
+        this.reloadDictionaries()
         Mousetrap.bind('n', () => this.toggleAddingVocabulary())
         Mousetrap.bind('b', () => this.toggleEditingVocabulary())
         Mousetrap.bind('f', () => this.toggleFilter())

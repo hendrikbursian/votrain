@@ -3,16 +3,18 @@ import Vuex from 'vuex'
 
 Vue.use(Vuex)
 
-const store = {
-    activeDictionaryId: -1,
-    dictionaries: [],
-    boxes: [],
+function getLocalState() {
+return {
+        activeDictionaryId: -1,
+        dictionaries: [],
+        boxes: [],
 
-    ...JSON.parse(localStorage.getItem('store'))
+        ...JSON.parse(localStorage.getItem('store'))
+    }
 }
 
 export default new Vuex.Store({
-    state: store,
+    state: getLocalState(),
     getters: {
         activeDictionary(state) {
             return state.dictionaries.find(
@@ -83,6 +85,15 @@ export default new Vuex.Store({
         },
         saveState({ state }) {
             localStorage.setItem('store', JSON.stringify(state))
+        },
+        saveState({ state }) {
+            localStorage.setItem('store', JSON.stringify(state))
+        },
+        reloadDictionaries({ state }) {
+            state.dictionaries = getLocalState().dictionaries
+        },
+        reloadVocabularies({ state, dispatch }) {
+            dispatch('reloadDictionaries')
         }
     },
 
