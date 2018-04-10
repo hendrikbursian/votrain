@@ -64,6 +64,8 @@ let vocabulary = {
 export default {
     data: function() {
         return {
+            addingVocabulary: false,
+            editingVocabulary: false,
             filterOn: false,
             filter: { ...vocabulary },
             newVocabulary: { ...vocabulary }
@@ -83,10 +85,6 @@ export default {
             else return this.activeDictionary.vocabularies
         },
 
-        ...mapState({
-            addingVocabulary: 'addingVocabulary',
-            editingVocabulary: 'editingVocabulary'
-        }),
         ...mapGetters({
             activeDictionary: 'activeDictionary'
         })
@@ -100,11 +98,17 @@ export default {
         toggleFilter() {
             this.filterOn = !this.filterOn
         },
+        toggleAddingVocabulary() {
+            this.editingVocabulary = false
+            this.addingVocabulary = !this.addingVocabulary
+        },
+        toggleEditingVocabulary() {
+            this.addingVocabulary = false
+            this.editingVocabulary = !this.editingVocabulary
+        },
 
         ...mapActions({
-            addVocabulary: 'addVocabulary',
-            toggleAddingVocabulary: 'toggleAddingVocabulary',
-            toggleEditingVocabulary: 'toggleEditingVocabulary'
+            addVocabulary: 'addVocabulary'
         })
     },
     beforeMount() {

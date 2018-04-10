@@ -7,10 +7,6 @@ const store = {
     activeDictionaryId: -1,
     dictionaries: [],
     boxes: [],
-    addingVocabulary: false,
-    addingDictionary: false,
-    editingDictionary: false,
-    editingVocabulary: false,
 
     ...JSON.parse(localStorage.getItem('store'))
 }
@@ -26,32 +22,6 @@ export default new Vuex.Store({
     },
 
     actions: {
-        toggleAddingDictionary({ commit, dispatch, state }) {
-            let b = !state.addingDictionary
-            dispatch('closeMenus')
-            commit('SET_ADDING_DICTIONARY', b)
-        },
-        toggleEditingDictionary({ commit, dispatch, state }) {
-            let b = !state.editingDictionary
-            dispatch('closeMenus')
-            commit('SET_EDITIING_DICTIONARY', b)
-        },
-        toggleAddingVocabulary({ commit, dispatch, state }) {
-            let b = !state.addingVocabulary
-            dispatch('closeMenus')
-            commit('SET_ADDING_VOCABULARY', b)
-        },
-        toggleEditingVocabulary({ commit, dispatch, state }) {
-            let b = !state.editingVocabulary
-            dispatch('closeMenus')
-            commit('SET_EDITING_VOCABULARY', b)
-        },
-        closeMenus({ commit, state }) {
-            commit('SET_ADDING_DICTIONARY', false)
-            commit('SET_EDITIING_DICTIONARY', false)
-            commit('SET_ADDING_VOCABULARY', false)
-            commit('SET_EDITING_VOCABULARY', false)
-        },
         addVocabulary({ commit, dispatch, getters, state }, vocabulary) {
             return new Promise((resolve, reject) => {
                 if (
@@ -73,7 +43,6 @@ export default new Vuex.Store({
                             category: vocabulary.category
                         })
 
-                        dispatch('toggleAddingVocabulary')
                         dispatch('saveState')
                         resolve()
                     } else {
@@ -97,7 +66,6 @@ export default new Vuex.Store({
                         commit('ADD_DICTIONARY', dictionary)
                         if (state.activeDictionaryId === -1)
                             commit('SET_ACTIVE_DICTIONARY_ID', 0)
-                        commit('SET_ADDING_DICTIONARY', false)
                         dispatch('saveState')
                         resolve()
                     } else {
@@ -134,18 +102,6 @@ export default new Vuex.Store({
                 lang2: dictionary.lang2,
                 vocabularies: []
             })
-        },
-        SET_ADDING_VOCABULARY(state, payload) {
-            state.addingVocabulary = payload
-        },
-        SET_ADDING_DICTIONARY(state, payload) {
-            state.addingDictionary = payload
-        },
-        SET_EDITIING_DICTIONARY(state, payload) {
-            state.editingDictionary = payload
-        },
-        SET_EDITING_VOCABULARY(state, payload) {
-            state.editingVocabulary = payload
         }
     }
 })

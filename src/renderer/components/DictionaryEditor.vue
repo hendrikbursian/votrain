@@ -1,14 +1,14 @@
 <template>
     <div>
         <transition-group tag="div" class="menu-bar u-full-width" name="slideLeft-fade">
-            <button :key="1" v-on:click="toggleAddingDictionary()">
+            <button :key="1" v-on:click="toggleAddingDictionary">
                 <i class="material-icons">{{ addingDictionary ? 'close' : 'book' }}</i> {{ addingDictionary ? 'Abbrechen' : 'Neues Wörterbuch' }}
             </button>
-            <button :key="2" v-if="!addingDictionary" v-on:click="toggleEditingDictionary()">
+            <button :key="2" v-if="!addingDictionary" v-on:click="toggleEditingDictionary">
                 <i class="material-icons">{{ editingDictionary ? 'save' : 'edit' }}</i> {{ editingDictionary ? 'Speichern' : 'Wörterbücher bearbeiten' }}
             </button>
-            <input :key="3" type="text" v-if="addingDictionary" v-model="newDictionary.lang1" @keyup.esc="toggleAddingDictionary()" @keyup.enter="addNewDictionary" placeholder="Sprache 1">
-            <input :key="4" type="text" v-if="addingDictionary" v-model="newDictionary.lang2" @keyup.esc="toggleAddingDictionary()" @keyup.enter="addNewDictionary" placeholder="Sprache 2">
+            <input :key="3" type="text" v-if="addingDictionary" v-model="newDictionary.lang1" @keyup.esc="toggleAddingDictionary" @keyup.enter="addNewDictionary" placeholder="Sprache 1">
+            <input :key="4" type="text" v-if="addingDictionary" v-model="newDictionary.lang2" @keyup.esc="toggleAddingDictionary" @keyup.enter="addNewDictionary" placeholder="Sprache 2">
             <button :key="5" v-if="addingDictionary" v-on:click="addNewDictionary">
                 <i class="material-icons">save</i> Speichern
             </button>
@@ -28,8 +28,8 @@
                     <td>{{ dictionary.vocabularies.length }}</td>
                 </tr>
                 <tr v-if="editingDictionary" v-bind:class="{active: dictionary.id === activeDictionaryId}" :key="index" v-for="(dictionary, index) in dictionaries">
-                    <td><input type="text" v-model="dictionary.lang1" @keyup.enter="toggleEditingDictionary()" placeholder="Sprache 1" /></td>
-                    <td><input type="text" v-model="dictionary.lang2" @keyup.enter="toggleEditingDictionary()" placeholder="Sprache 2" /></td>
+                    <td><input type="text" v-model="dictionary.lang1" @keyup.enter="toggleEditingDictionary" placeholder="Sprache 1" /></td>
+                    <td><input type="text" v-model="dictionary.lang2" @keyup.enter="toggleEditingDictionary" placeholder="Sprache 2" /></td>
                     <td>{{ dictionary.vocabularies.length }}</td>
                 </tr>
             </tbody>
@@ -48,29 +48,35 @@ let dictionary = {
 export default {
     data: function() {
         return {
-            newDictionary: { ...dictionary }
+            newDictionary: { ...dictionary },
+            addingDictionary: false,
+            editingDictionary: false
         }
     },
     computed: {
         ...mapState({
             dictionaries: 'dictionaries',
-            addingDictionary: 'addingDictionary',
-            editingDictionary: 'editingDictionary',
             activeDictionaryId: 'activeDictionaryId'
-        }),
+        })
     },
     methods: {
         addNewDictionary() {
-            this.addDictionary(this.newDictionary).then(
-                () => (this.newDictionary = { ...dictionary })
-            ).catch(alert)
+            this.addDictionary(this.newDictionary)
+                .then(() => (this.newDictionary = { ...dictionary }))
+                .catch(alert)
+        },
+        toggleAddingDictionary() {
+            this.editingDictionary = false
+            this.addingDictionary = !this.addingDictionary
+        },
+        toggleEditingDictionary() {
+            this.addingDictionary = false
+            this.editingDictionary = !this.editingDictionary
         },
 
         ...mapActions({
             addDictionary: 'addDictionary',
-            setActiveDictionaryId: 'setActiveDictionaryId',
-            toggleAddingDictionary: 'toggleAddingDictionary',
-            toggleEditingDictionary: 'toggleEditingDictionary'
+            setActiveDictionaryId: 'setActiveDictionaryId'
         })
     },
     beforeMount() {
