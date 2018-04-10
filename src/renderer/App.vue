@@ -11,9 +11,10 @@
         </div>
         <nav>
             <router-link to="dictionaries">Wörterbücher</router-link>
-            <router-link v-if="activeDictionaryId !== -1" to="vocabularies">Vokabeln</router-link>
-            <router-link v-if="activeDictionaryId !== -1 && filteredVocabularies.length > 0" to="boxes">Karteikasten</router-link>
-            <router-link v-if="activeDictionaryId !== -1" to="vocabularies">Lernen</router-link>
+            <router-link v-if="showVocabularyNav" to="vocabularies">Vokabeln</router-link>
+            <router-link v-if="showBoxesNav" to="boxes">Boxes</router-link>
+            <router-link v-if="showLearningNav" to="learning">Lernen</router-link>
+            <router-link to="help">Hilfe</router-link>
         </nav>
     </header>
     <main>
@@ -28,14 +29,18 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex'
+import { mapGetters, mapActions, mapState } from 'vuex'
 
 export default {
     computed: {
-        ...mapGetters({
+        ...mapState({
             dictionaries: 'dictionaries',
-            filteredVocabularies: 'filteredVocabularies'
+            boxes: 'boxes'
         }),
+        ...mapGetters({
+            activeDictionary: 'activeDictionary'
+        }),
+
         activeDictionaryId: {
             get() {
                 return this.$store.state.activeDictionaryId
@@ -46,9 +51,29 @@ export default {
         }
     },
     methods: {
+        showVocabularyNav() {
+            return this.activeDictionaryId !== -1
+        },
+        showBoxesNav() {
+            return (
+                this.showVocabularyNav &&
+                this.activeDictionary.vocabularies.length > 0
+            )
+        },
+        showLearningNav() {
+            return this.showBoxesNav && this.boxes.length > 0
+        },
+
         ...mapActions({
-            setActiveDictionaryId:'setActiveDictionaryId'
+            setActiveDictionaryId: 'setActiveDictionaryId'
         })
+    },
+    beforeMount() {
+        Mousetrap.bind('1', () => this.$router.push('dictionaries'))
+        Mousetrap.bind('2', () => this.$router.push('vocabularies'))
+        Mousetrap.bind('3', () => this.$router.push('boxes'))
+        Mousetrap.bind('4', () => this.$router.push('learning'))
+        Mousetrap.bind('5', () => this.$router.push('help'))
     },
     created() {
         if (this.activeDictionaryId === -1)

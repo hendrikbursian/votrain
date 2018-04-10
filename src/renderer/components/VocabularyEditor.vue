@@ -1,11 +1,11 @@
 <template>
     <div>
         <transition-group tag="div" class="menu-bar u-full-width" name="slideLeft-fade">
-            <button :key="1" v-on:click="toggleFilter()">
-                <i class="material-icons">{{ filter ? 'close' : 'filter_list' }}</i> {{ filter ? 'Abbrechen' : 'Filtern' }}
+            <button :key="1" v-on:click="toggleFilter">
+                <i class="material-icons">{{ filterOn ? 'close' : 'filter_list' }}</i> {{ filterOn ? 'Abbrechen' : 'Filter' }}
             </button>
             <button :key="2" v-on:click="toggleAddingVocabulary()">
-                <i class="material-icons">{{ addingVocabulary ? 'close' : 'add' }}</i> {{ addingVocabulary ? 'Abbrechen' : 'Wort hinzufügen' }}
+                <i class="material-icons">{{ addingVocabulary ? 'close' : 'add' }}</i> {{ addingVocabulary ? 'Abbrechen' : 'Neue Vokabel' }}
             </button>
             <button :key="3" v-if="!addingVocabulary" v-on:click="toggleEditingVocabulary()">
                 <i class="material-icons">{{ editingVocabulary ? 'save' : 'edit' }}</i> {{ editingVocabulary ? 'Speichern' : 'Vokabeln bearbeiten' }}
@@ -20,27 +20,27 @@
         </transition-group>
         <table class="u-full-width">
             <thead>
-                <tr v-if="!filter">
+                <tr v-if="!filterOn">
                     <th style="width:25%">{{ activeDictionary.lang1 }}</th>
                     <th style="width:25%">{{ activeDictionary.lang2 }}</th>
                     <th style="width:25%">Notiz</th>
                     <th style="width:25%">Kategorie</th>
                 </tr>
-                <tr v-if="filter">
-                    <th style="width:25%"><input type="text" v-model="query.lang1" :placeholder="activeDictionary.lang1"></th>
-                    <th style="width:25%"><input type="text" v-model="query.lang2" :placeholder="activeDictionary.lang2"></th>
-                    <th style="width:25%"><input type="text" v-model="query.note" placeholder="Notiz"></th>
-                    <th style="width:25%"><input type="text" v-model="query.category" placeholder="Kategorie"></th>
+                <tr v-if="filterOn">
+                    <th style="width:25%"><input type="text" v-model="filter.lang1" :placeholder="activeDictionary.lang1"></th>
+                    <th style="width:25%"><input type="text" v-model="filter.lang2" :placeholder="activeDictionary.lang2"></th>
+                    <th style="width:25%"><input type="text" v-model="filter.note" placeholder="Notiz"></th>
+                    <th style="width:25%"><input type="text" v-model="filter.category" placeholder="Kategorie"></th>
                 </tr>
             </thead>
             <tbody>
-                <tr v-if="!editingVocabulary" :key="index" v-for="(vocabulary, index) in filteredVocabularies">
+                <tr v-if="!editingVocabulary" :key="index" v-for="(vocabulary, index) in vocabularies">
                     <td>{{ vocabulary.lang1 }}</td>
                     <td>{{ vocabulary.lang2 }}</td>
                     <td>{{ vocabulary.note }}</td>
                     <td>{{ vocabulary.category }}</td>
                 </tr>
-                <tr v-if="editingVocabulary" :key="index" v-for="(vocabulary, index) in filteredVocabularies">
+                <tr v-if="editingVocabulary" :key="index" v-for="(vocabulary, index) in vocabularies">
                     <td><input type="text" v-model="vocabulary.lang1" @keyup.enter="toggleEditingVocabulary()" :placeholder="activeDictionary.lang1"></td>
                     <td><input type="text" v-model="vocabulary.lang2" @keyup.enter="toggleEditingVocabulary()" :placeholder="activeDictionary.lang2"></td>
                     <td><input type="text" v-model="vocabulary.note" @keyup.enter="toggleEditingVocabulary()" placeholder="Notiz"></td>
@@ -64,19 +64,31 @@ let vocabulary = {
 export default {
     data: function() {
         return {
+            filterOn: false,
+            filter: { ...vocabulary },
             newVocabulary: { ...vocabulary }
         }
     },
     computed: {
+        vocabularies() {
+            if (this.filterOn)
+                return this.activeDictionary.vocabularies.filter(voc => {
+                    return (
+                        voc.lang1.search(this.filter.lang1) !== -1 &&
+                        voc.lang2.search(this.filter.lang2) !== -1 &&
+                        voc.note.search(this.filter.note) !== -1 &&
+                        voc.category.search(this.filter.category) !== -1
+                    )
+                })
+            else return this.activeDictionary.vocabularies
+        },
+
         ...mapState({
-            filter: 'filter',
-            query: 'query',
             addingVocabulary: 'addingVocabulary',
             editingVocabulary: 'editingVocabulary'
         }),
         ...mapGetters({
-            activeDictionary: 'activeDictionary',
-            filteredVocabularies: 'filteredVocabularies'
+            activeDictionary: 'activeDictionary'
         })
     },
     methods: {
@@ -85,12 +97,14 @@ export default {
                 .then(() => (this.newVocabulary = { ...vocabulary }))
                 .catch(alert)
         },
+        toggleFilter() {
+            this.filterOn = !this.filterOn
+        },
 
         ...mapActions({
             addVocabulary: 'addVocabulary',
             toggleAddingVocabulary: 'toggleAddingVocabulary',
-            toggleEditingVocabulary: 'toggleEditingVocabulary',
-            toggleFilter: 'toggleFilter'
+            toggleEditingVocabulary: 'toggleEditingVocabulary'
         })
     },
     beforeMount() {
