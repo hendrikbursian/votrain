@@ -84,11 +84,11 @@ export default new Vuex.Store({
                 }
             })
         },
-        addDictionary({ commit, dispatch, getters, state }, dictionary) {
+        addDictionary({ commit, dispatch, state }, dictionary) {
             return new Promise((resolve, reject) => {
                 if (dictionary.lang1 && dictionary.lang2) {
                     if (
-                        !getters.dictionaries.find(
+                        !state.dictionaries.find(
                             dic =>
                                 dic.lang1 == dictionary.lang1 &&
                                 dic.lang2 == dictionary.lang2
