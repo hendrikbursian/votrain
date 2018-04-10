@@ -36,20 +36,19 @@ export default new Vuex.Store({
                                 voc.lang2 == vocabulary.lang2
                         )
                     ) {
-                        getters.activeDictionary.vocabularies.push({
-                            lang1: vocabulary.lang1,
-                            lang2: vocabulary.lang2,
-                            note: vocabulary.note,
-                            category: vocabulary.category
-                        })
-
+                        commit(
+                            'ADD_VOCABULARY_TO_ACTIVE_DICTIONARY',
+                            vocabulary
+                        )
                         dispatch('saveState')
                         resolve()
                     } else {
                         reject('Das Wort ist bereits enthalten')
                     }
                 } else {
-                    reject('Das Wort enthält nicht alle erforderlichen Angaben.')
+                    reject(
+                        'Das Wort enthält nicht alle erforderlichen Angaben.'
+                    )
                 }
             })
         },
@@ -102,6 +101,16 @@ export default new Vuex.Store({
                 lang2: dictionary.lang2,
                 vocabularies: []
             })
+        },
+        ADD_VOCABULARY_TO_ACTIVE_DICTIONARY(state, vocabulary) {
+            state.dictionaries
+                .find(dic => dic.id === state.activeDictionaryId)
+                .vocabularies.push({
+                    lang1: vocabulary.lang1,
+                    lang2: vocabulary.lang2,
+                    note: vocabulary.note,
+                    category: vocabulary.category
+                })
         }
     }
 })
