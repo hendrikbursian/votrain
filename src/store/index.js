@@ -6,17 +6,11 @@ Vue.use(Vuex)
 const store = {
     activeDictionaryId: -1,
     dictionaries: [],
+    boxes: [],
     addingVocabulary: false,
     addingDictionary: false,
     editingDictionary: false,
     editingVocabulary: false,
-    filter: false,
-    query: {
-        lang1: '',
-        lang2: '',
-        note: '',
-        category: ''
-    },
 
     ...JSON.parse(localStorage.getItem('store'))
 }
@@ -24,32 +18,14 @@ const store = {
 export default new Vuex.Store({
     state: store,
     getters: {
-        dictionaries(state) {
-            return state.dictionaries
-        },
         activeDictionary(state) {
             return state.dictionaries.find(
                 dictionary => dictionary.id === state.activeDictionaryId
             )
-        },
-        filteredVocabularies(state, getters) {
-            if (state.filter)
-                return getters.activeDictionary.vocabularies.filter(voc => {
-                    return (
-                        voc.lang1.search(state.query.lang1) !== -1 &&
-                        voc.lang2.search(state.query.lang2) !== -1 &&
-                        voc.note.search(state.query.note) !== -1 &&
-                        voc.category.search(state.query.category) !== -1
-                    )
-                })
-            else return getters.activeDictionary.vocabularies
         }
     },
 
     actions: {
-        toggleFilter({ commit }) {
-            commit('TOGGLE_FILTER')
-        },
         toggleAddingDictionary({ commit, dispatch, state }) {
             let b = !state.addingDictionary
             dispatch('closeMenus')
@@ -170,9 +146,6 @@ export default new Vuex.Store({
         },
         SET_EDITING_VOCABULARY(state, payload) {
             state.editingVocabulary = payload
-        },
-        TOGGLE_FILTER(state) {
-            state.filter = !state.filter
         }
     }
 })

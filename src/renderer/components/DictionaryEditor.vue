@@ -2,7 +2,7 @@
     <div>
         <transition-group tag="div" class="menu-bar u-full-width" name="slideLeft-fade">
             <button :key="1" v-on:click="toggleAddingDictionary()">
-                <i class="material-icons">{{ addingDictionary ? 'close' : 'book' }}</i> {{ addingDictionary ? 'Abbrechen' : 'Wörterbuch hinzufügen' }}
+                <i class="material-icons">{{ addingDictionary ? 'close' : 'book' }}</i> {{ addingDictionary ? 'Abbrechen' : 'Neues Wörterbuch' }}
             </button>
             <button :key="2" v-if="!addingDictionary" v-on:click="toggleEditingDictionary()">
                 <i class="material-icons">{{ editingDictionary ? 'save' : 'edit' }}</i> {{ editingDictionary ? 'Speichern' : 'Wörterbücher bearbeiten' }}
@@ -38,7 +38,7 @@
 </template>
 
 <script>
-import { mapGetters, mapState, mapActions } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 
 let dictionary = {
     lang1: '',
@@ -53,13 +53,11 @@ export default {
     },
     computed: {
         ...mapState({
+            dictionaries: 'dictionaries',
             addingDictionary: 'addingDictionary',
             editingDictionary: 'editingDictionary',
             activeDictionaryId: 'activeDictionaryId'
         }),
-        ...mapGetters({
-            dictionaries: 'dictionaries'
-        })
     },
     methods: {
         addNewDictionary() {

@@ -26,6 +26,11 @@ export default new Router({
             component: require('@/components/Learning').default
         },
         {
+            path: '/help',
+            name: 'help',
+            component: require('@/components/Help').default
+        },
+        {
             path: '*',
             redirect: '/dictionaries'
         }
