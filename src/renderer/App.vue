@@ -12,7 +12,7 @@
         <nav>
             <router-link to="dictionaries">Wörterbücher</router-link>
             <router-link v-if="showVocabularyNav" to="vocabularies">Vokabeln</router-link>
-            <router-link v-if="showBoxesNav" to="boxes">Boxes</router-link>
+            <router-link v-if="showBoxesNav" to="boxes">Karteikästen</router-link>
             <router-link v-if="showLearningNav" to="learning">Lernen</router-link>
             <router-link to="help">Hilfe</router-link>
         </nav>
