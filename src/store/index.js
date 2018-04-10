@@ -34,7 +34,6 @@ saveState(store)
 
 export default new Vuex.Store({
     state: store,
-    strict: true,
     getters: {
         dictionaries(state) {
             return state.dictionaries

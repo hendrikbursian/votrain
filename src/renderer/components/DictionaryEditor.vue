@@ -22,7 +22,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr v-if="!editingDictionary" v-bind:class="{active: dictionary.id === activeDictionary}" v-on:click="setActiveDictionary(dictionary.id); $router.push('vocabularies')" :key="index" v-for="(dictionary, index) in dictionaries">
+                <tr v-if="!editingDictionary" v-bind:class="{active: dictionary.id === activeDictionary}" v-on:click="setActiveDictionaryId(dictionary.id); $router.push('vocabularies')" :key="index" v-for="(dictionary, index) in dictionaries">
                     <td>{{ dictionary.lang1 }}</td>
                     <td>{{ dictionary.lang2 }}</td>
                     <td>{{ dictionary.vocabularies.length }}</td>
@@ -55,7 +55,7 @@ export default {
     methods: {
         ...mapActions({
             addDictionary: 'addDictionary',
-            setActiveDictionary: 'setActiveDictionary',
+            setActiveDictionaryId: 'setActiveDictionaryId',
             toggleAddingDictionary: 'toggleAddingDictionary',
             toggleEditingDictionary: 'toggleEditingDictionary'
         })
