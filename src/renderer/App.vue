@@ -23,7 +23,7 @@
         </div>
     </main>
     <footer>
-      <span>Crafted with <i class="material-icons">favorite</i> by <a href="https://hendrikbursian.github.io">Hendrik Bursian</a></span>
+      <span>Crafted with <i class="material-icons">favorite</i> by <a target="_blank" href="https://hendrikbursian.github.io">Hendrik Bursian</a></span>
     </footer>
   </div>
 </template>
