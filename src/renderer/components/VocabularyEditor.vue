@@ -33,7 +33,7 @@
                     v-bind:class="{ delete: deleting }"
                     :key="index"
                     v-for="(vocabulary, index) in vocabularies"
-                    v-on:click="deleting ? deleteVocabulary(vocabulary.id) : noop"
+                    v-on:click="deleting ? deleteVocabulary(vocabulary.id) : ()=>{}"
                 >
                     <td>{{ vocabulary.lang1 }}</td>
                     <td>{{ vocabulary.lang2 }}</td>
@@ -54,13 +54,6 @@
 <script>
 import { mapGetters, mapState, mapActions } from 'vuex'
 
-let vocabulary = {
-    lang1: '',
-    lang2: '',
-    note: '',
-    category: ''
-}
-
 export default {
     data: function() {
         return {
@@ -68,8 +61,8 @@ export default {
             editing: false,
             deleting: false,
             filterOn: false,
-            filter: { ...vocabulary },
-            newVocabulary: { ...vocabulary }
+            filter: {},
+            newVocabulary: {}
         }
     },
     computed: {
@@ -100,13 +93,13 @@ export default {
         save() {
             if (this.adding)
                 this.addVocabulary(this.newVocabulary)
-                    .then(() => (this.newVocabulary = { ...vocabulary }))
+                    .then(() => (this.newVocabulary = {}))
                     .catch(alert)
             this.saveState()
             this.closeMenus()
         },
         cancel() {
-            if (this.adding) this.newVocabulary = { ...vocabulary }
+            if (this.adding) this.newVocabulary = {}
             this.closeMenus()
             this.loadState()
         },

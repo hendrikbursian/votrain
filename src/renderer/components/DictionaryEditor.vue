@@ -42,15 +42,10 @@
 <script>
 import { mapState, mapActions } from 'vuex'
 
-let dictionary = {
-    lang1: '',
-    lang2: ''
-}
-
 export default {
     data: function() {
         return {
-            newDictionary: { ...dictionary },
+            newDictionary: { },
             adding: false,
             editing: false,
             deleting: false
@@ -63,6 +58,14 @@ export default {
         })
     },
     methods: {
+        // TODO: Add Category dropdown
+        // categories() {
+        //     return Array.from(
+        //         new Set(
+        //             this.activeDictionary.vocabularies.map(voc => voc.category)
+        //         )
+        //     )
+        // },
         closeMenus() {
             this.adding = false
             this.editing = false
@@ -73,7 +76,7 @@ export default {
             if (this.adding)
                 this.addDictionary(this.newDictionary)
                     .then(() => {
-                        this.newDictionary = { ...dictionary }
+                        this.newDictionary = { }
                         this.saveState()
                         this.closeMenus()
                     })
@@ -84,7 +87,7 @@ export default {
             }
         },
         cancel() {
-            if (this.adding) this.newDictionary = { ...dictionary }
+            if (this.adding) this.newDictionary = { }
             this.closeMenus()
             this.loadState()
         },
