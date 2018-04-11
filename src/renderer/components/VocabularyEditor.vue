@@ -13,7 +13,7 @@
             <button :key="9" v-if="adding || editing || deleting" v-on:click="save"><i class="material-icons">save</i> Speichern</button>
             <button :key="10" v-if="deleting" v-on:click="deleteAll"><i class="material-icons">{{ filterOn ? 'delete_sweep' : 'delete_forever' }}</i> {{ filterOn ? 'Gefilterte Löschen' : 'Alle löschen' }}</button>
         </transition-group>
-        <div class="editor-area">
+        <div class="display-area">
             <table class="u-full-width">
                 <thead>
                     <tr v-if="!filterOn">

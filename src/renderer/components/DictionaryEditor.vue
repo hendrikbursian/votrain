@@ -10,7 +10,7 @@
             <button :key="6" v-if="adding || editing || deleting" v-on:click="save"><i class="material-icons">save</i> Speichern</button>
             <button :key="7" v-if="deleting" v-on:click="deleteAll"><i class="material-icons">delete_sweep</i> Alle löschen</button>
         </transition-group>
-        <div class="editor-area">
+        <div class="display-area">
             <table class="u-full-width">
                 <thead>
                     <tr>
