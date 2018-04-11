@@ -31,8 +31,8 @@
             <tbody>
                 <tr v-if="!editing"
                     v-bind:class="{ delete: deleting }"
-                    :key="index"
-                    v-for="(vocabulary, index) in vocabularies"
+                    :key="vocabulary.id"
+                    v-for="vocabulary in vocabularies"
                     v-on:click="deleting ? deleteVocabulary(vocabulary.id) : ()=>{}"
                 >
                     <td>{{ vocabulary.lang1 }}</td>
@@ -40,7 +40,7 @@
                     <td>{{ vocabulary.note }}</td>
                     <td>{{ vocabulary.category }}</td>
                 </tr>
-                <tr v-if="editing" :key="index" v-for="(vocabulary, index) in vocabularies">
+                <tr v-if="editing" :key="vocabulary.id" v-for="vocabulary in vocabularies">
                     <td><input type="text" v-model="vocabulary.lang1" @keyup.enter="save" @keyup.esc="cancel" :placeholder="activeDictionary.lang1"></td>
                     <td><input type="text" v-model="vocabulary.lang2" @keyup.enter="save" @keyup.esc="cancel" :placeholder="activeDictionary.lang2"></td>
                     <td><input type="text" v-model="vocabulary.note" @keyup.enter="save" @keyup.esc="cancel" placeholder="Notiz"></td>
