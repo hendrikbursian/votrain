@@ -104,6 +104,8 @@ export default {
 <style src="../../static/css/normalize.css"></style>
 <style src="../../static/css/fonts.css"></style>
 <style src="../../static/css/skeleton.css"></style>
+<style src="./assets/css/editor.css"></style>
+
 <style scoped>
 @keyframes heartbeat {
     from {

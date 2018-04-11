@@ -132,5 +132,3 @@ export default {
     }
 }
 </script>
-
-<style src="../assets/css/editor.css"></style>
