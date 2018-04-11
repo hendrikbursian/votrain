@@ -34,6 +34,7 @@ import { mapGetters, mapActions, mapState } from 'vuex'
 export default {
     computed: {
         ...mapState({
+            adi: 'activeDictionaryId',
             dictionaries: 'dictionaries',
             boxes: 'boxes'
         }),
@@ -42,7 +43,7 @@ export default {
         }),
 
         showVocabulariesNav() {
-            return this.activeDictionaryId !== -1
+            return this.adi !== -1
         },
         showLearningNav() {
             return (
@@ -53,16 +54,19 @@ export default {
         },
         activeDictionaryId: {
             get() {
-                return this.$store.state.activeDictionaryId
+                return this.adi
             },
             set(activeDictionaryId) {
-                this.setActiveDictionaryId(activeDictionaryId)
+                this.setActiveDictionaryId(activeDictionaryId).then(
+                    this.saveState
+                )
             }
         }
     },
     methods: {
         ...mapActions({
-            setActiveDictionaryId: 'setActiveDictionaryId'
+            setActiveDictionaryId: 'setActiveDictionaryId',
+            saveState: 'saveState'
         })
     },
     beforeMount() {
@@ -89,7 +93,7 @@ export default {
         })
     },
     created() {
-        if (this.activeDictionaryId === -1)
+        if (this.adi === -1)
             alert(
                 'Bevor du loslegen kannst brauchst du ein Wörterbuch. Klicke auf "Wörterbuch hinzufügen" um ein Neues anzulegen.'
             )

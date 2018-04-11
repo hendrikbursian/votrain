@@ -17,6 +17,7 @@
                 <ul class="shortcut-list">
                     <li><b>N</b> - Neues Wörterbuch</li>
                     <li><b>B</b> - Wörterbücher bearbeiten</li>
+                    <li><b>L</b> - Wörterbücher löschen</li>
                 </ul>
             </div>
             <div class="column">
@@ -24,7 +25,8 @@
                 <ul class="shortcut-list">
                     <li><b>N</b> - Neue Vokabel</li>
                     <li><b>B</b> - Vokabeln bearbeiten</li>
-                    <li><b>F</b> - Vokabel filtern</li>
+                    <li><b>F</b> - Vokabeln filtern</li>
+                    <li><b>L</b> - Vokabeln löschen</li>
                 </ul>
             </div>       
         </div>

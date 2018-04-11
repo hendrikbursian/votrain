@@ -1,23 +1,14 @@
 <template>
     <div>
         <transition-group tag="div" class="menu-bar u-full-width" name="slideLeft-fade">
-            <button :key="1" v-on:click="toggleAddingDictionary">
-                <i class="material-icons">{{ addingDictionary ? 'close' : 'book' }}</i> {{ addingDictionary ? 'Abbrechen' : 'Neues Wörterbuch' }}
-            </button>
-            <button :key="2" v-if="!addingDictionary && !editingDictionary" v-on:click="toggleEditingDictionary">
-                <i class="material-icons">edit</i> Wörterbücher bearbeiten
-            </button>
-            <button :key="3" v-if="editingDictionary" v-on:click="cancel">
-                <i class="material-icons">close</i> Abbrechen
-            </button>
-            <button :key="4" v-if="editingDictionary" v-on:click="save">
-                <i class="material-icons">save</i> Speichern
-            </button>
-            <input :key="5" type="text" v-if="addingDictionary" v-model="newDictionary.lang1" @keyup.esc="toggleAddingDictionary" @keyup.enter="addNewDictionary" placeholder="Sprache 1">
-            <input :key="6" type="text" v-if="addingDictionary" v-model="newDictionary.lang2" @keyup.esc="toggleAddingDictionary" @keyup.enter="addNewDictionary" placeholder="Sprache 2">
-            <button :key="7" v-if="addingDictionary" v-on:click="addNewDictionary">
-                <i class="material-icons">save</i> Speichern
-            </button>
+            <button :key="1" v-if="!adding" v-on:click="closeMenus();adding = true"><i class="material-icons">book</i> Neues Wörterbuch</button>
+            <button :key="2" v-if="!editing" v-on:click="closeMenus();editing = true"><i class="material-icons">edit</i> Wörterbücher bearbeiten</button>
+            <button :key="3" v-if="!deleting" v-on:click="closeMenus();deleting = true"><i class="material-icons">delete</i> Wörterbücher löschen</button>
+            <button :key="6" v-if="adding || editing || deleting" v-on:click="cancel"><i class="material-icons">close</i> Abbrechen</button>
+            <input :key="4" type="text" v-if="adding" v-model="newDictionary.lang1" @keyup.esc="adding = false" @keyup.enter="save" placeholder="Sprache 1">
+            <input :key="5" type="text" v-if="adding" v-model="newDictionary.lang2" @keyup.esc="adding = false" @keyup.enter="save" placeholder="Sprache 2">
+            <button :key="7" v-if="adding || editing || deleting" v-on:click="save"><i class="material-icons">save</i> Speichern</button>
+            <button :key="8" v-if="deleting" v-on:click="deleteAll"><i class="material-icons">delete_sweep</i> Alle löschen</button>
         </transition-group>
         <table class="u-full-width">
             <thead>
@@ -28,12 +19,12 @@
                 </tr>
             </thead>
             <tbody>
-                <tr v-if="!editingDictionary" v-bind:class="{active: dictionary.id === activeDictionaryId}" v-on:click="setActiveDictionaryId(dictionary.id); $router.push('vocabularies')" :key="index" v-for="(dictionary, index) in dictionaries">
-                    <td>{{ dictionary.lang1 }}</td>
-                    <td>{{ dictionary.lang2 }}</td>
-                    <td>{{ dictionary.vocabularies.length }}</td>
+                <tr v-if="!editing" v-bind:class="{active: dictionary.id === activeDictionaryId, delete: deleting}" :key="index" v-for="(dictionary, index) in dictionaries">
+                    <td v-on:click="deleting ? deleteDictionary(dictionary.id) : openDictionary(dictionary.id)">{{ dictionary.lang1 }}</td>
+                    <td v-on:click="deleting ? deleteDictionary(dictionary.id) : openDictionary(dictionary.id)">{{ dictionary.lang2 }}</td>
+                    <td v-on:click="deleting ? deleteDictionary(dictionary.id) : openDictionary(dictionary.id)">{{ dictionary.vocabularies.length }}</td>
                 </tr>
-                <tr v-if="editingDictionary" v-bind:class="{active: dictionary.id === activeDictionaryId}" :key="index" v-for="(dictionary, index) in dictionaries">
+                <tr v-if="editing" v-bind:class="{active: dictionary.id === activeDictionaryId}" :key="index" v-for="(dictionary, index) in dictionaries">
                     <td><input type="text" v-model="dictionary.lang1" @keyup.enter="save" @keyup.esc="cancel" placeholder="Sprache 1" /></td>
                     <td><input type="text" v-model="dictionary.lang2" @keyup.enter="save" @keyup.esc="cancel" placeholder="Sprache 2" /></td>
                     <td>{{ dictionary.vocabularies.length }}</td>
@@ -55,8 +46,9 @@ export default {
     data: function() {
         return {
             newDictionary: { ...dictionary },
-            addingDictionary: false,
-            editingDictionary: false
+            adding: false,
+            editing: false,
+            deleting: false
         }
     },
     computed: {
@@ -66,39 +58,56 @@ export default {
         })
     },
     methods: {
-        addNewDictionary() {
-            this.addDictionary(this.newDictionary)
-                .then(() => (this.newDictionary = { ...dictionary }))
-                .catch(alert)
-        },
-        toggleAddingDictionary() {
-            this.editingDictionary = false
-            this.addingDictionary = !this.addingDictionary
-        },
-        toggleEditingDictionary() {
-            this.addingDictionary = false
-            this.editingDictionary = !this.editingDictionary
+        closeMenus() {
+            this.adding = false
+            this.editing = false
+            this.deleting = false
+            this.loadState()
         },
         save() {
-            this.editingDictionary = false
+            if (this.adding)
+                this.addDictionary(this.newDictionary)
+                    .then(() => (this.newDictionary = { ...dictionary }))
+                    .catch(alert)
             this.saveState()
+            this.closeMenus()
         },
         cancel() {
-            this.editingDictionary = false
-            this.reloadDictionaries()
+            if (this.adding) this.newDictionary = { ...dictionary }
+            this.closeMenus()
+            this.loadState()
+        },
+        deleteAll() {
+            console.log('delete all')
+        },
+        openDictionary(dictionaryId) {
+            this.setActiveDictionaryId(dictionaryId)
+            this.saveState()
+            this.$router.push('vocabularies')
         },
 
         ...mapActions({
             addDictionary: 'addDictionary',
+            deleteDictionary: 'deleteDictionary',
             setActiveDictionaryId: 'setActiveDictionaryId',
             saveState: 'saveState',
-            reloadDictionaries: 'reloadDictionaries'
+            loadState: 'loadState'
         })
     },
     beforeMount() {
-        this.reloadDictionaries()
-        Mousetrap.bind('n', () => this.toggleAddingDictionary())
-        Mousetrap.bind('b', () => this.toggleEditingDictionary())
+        this.loadState()
+        Mousetrap.bind(
+            'n',
+            () => (this.adding ? this.cancel() : (this.adding = true))
+        )
+        Mousetrap.bind(
+            'b',
+            () => (this.editing ? this.cancel() : (this.editing = true))
+        )
+        Mousetrap.bind(
+            'l',
+            () => (this.deleting ? this.cancel() : (this.deleting = true))
+        )
     }
 }
 </script>

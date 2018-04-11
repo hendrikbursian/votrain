@@ -3,12 +3,15 @@ import Vuex from 'vuex'
 
 Vue.use(Vuex)
 
-function getLocalState() {
-return {
-        activeDictionaryId: -1,
-        dictionaries: [],
-        boxes: [],
+const defaultState = {
+    activeDictionaryId: -1,
+    dictionaries: [],
+    boxes: []
+}
 
+function getLocalState() {
+    return {
+        ...defaultState,
         ...JSON.parse(localStorage.getItem('store'))
     }
 }
@@ -79,25 +82,54 @@ export default new Vuex.Store({
                 }
             })
         },
-        setActiveDictionaryId({ commit, dispatch, state }, dictionaryId) {
-            commit('SET_ACTIVE_DICTIONARY_ID', dictionaryId)
-            dispatch('saveState')
+        setActiveDictionaryId({ commit, dispatch }, dictionaryId) {
+            return new Promise(resolve => {
+                commit('SET_ACTIVE_DICTIONARY_ID', dictionaryId)
+                resolve()
+            })
+        },
+        deleteDictionary({ commit, state }, dictionaryId) {
+            return new Promise(resolve => {
+                if (state.activeDictionaryId === dictionaryId) {
+                    if (state.dictionaries.length === 1) {
+                        commit('SET_ACTIVE_DICTIONARY_ID', -1)
+                    } else {
+                        if (state.dictionaries[0].id === dictionaryId)
+                            commit(
+                                'SET_ACTIVE_DICTIONARY_ID',
+                                state.dictionaries[1].id
+                            )
+                        else
+                            commit(
+                                'SET_ACTIVE_DICTIONARY_ID',
+                                state.dictionaries[0].id
+                            )
+                    }
+                }
+                commit('DELETE_DICTIONARY', dictionaryId)
+                resolve()
+            })
         },
         saveState({ state }) {
-            localStorage.setItem('store', JSON.stringify(state))
+            return new Promise(resolve => {
+                localStorage.setItem('store', JSON.stringify(state))
+                resolve()
+            })
         },
-        saveState({ state }) {
-            localStorage.setItem('store', JSON.stringify(state))
-        },
-        reloadDictionaries({ state }) {
-            state.dictionaries = getLocalState().dictionaries
-        },
-        reloadVocabularies({ state, dispatch }) {
-            dispatch('reloadDictionaries')
+        loadState({ state, commit }) {
+            return new Promise(resolve => {
+                commit('UPDATE_STATE', getLocalState())
+                resolve()
+            })
         }
     },
 
     mutations: {
+        UPDATE_STATE(state, stateUpdate) {
+            Object.keys(defaultState).forEach(
+                key => (state[key] = stateUpdate[key])
+            )
+        },
         SET_ACTIVE_DICTIONARY_ID(state, dictionaryId) {
             state.activeDictionaryId = dictionaryId
         },
@@ -111,6 +143,11 @@ export default new Vuex.Store({
                 lang1: dictionary.lang1,
                 lang2: dictionary.lang2,
                 vocabularies: []
+            })
+        },
+        DELETE_DICTIONARY(state, dictionaryId) {
+            state.dictionaries = state.dictionaries.filter(function(dic) {
+                return dic.id !== dictionaryId
             })
         },
         ADD_VOCABULARY_TO_ACTIVE_DICTIONARY(state, vocabulary) {

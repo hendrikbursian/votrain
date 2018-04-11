@@ -4,23 +4,23 @@
             <button :key="1" v-on:click="toggleFilter">
                 <i class="material-icons">{{ filterOn ? 'close' : 'filter_list' }}</i> {{ filterOn ? 'Abbrechen' : 'Filter' }}
             </button>
-            <button :key="2" v-on:click="toggleAddingVocabulary">
-                <i class="material-icons">{{ addingVocabulary ? 'close' : 'add' }}</i> {{ addingVocabulary ? 'Abbrechen' : 'Neue Vokabel' }}
+            <button :key="2" v-on:click="toggleAdding">
+                <i class="material-icons">{{ adding ? 'close' : 'add' }}</i> {{ adding ? 'Abbrechen' : 'Neue Vokabel' }}
             </button>
-            <button :key="3" v-if="!addingVocabulary && !editingVocabulary" v-on:click="toggleEditingVocabulary">
+            <button :key="3" v-if="!adding && !editing" v-on:click="toggleEditing">
                 <i class="material-icons">edit</i> Vokabeln bearbeiten
             </button>
-            <button :key="4" v-if="editingVocabulary" v-on:click="save">
+            <button :key="4" v-if="editing" v-on:click="save">
                 <i class="material-icons">save</i> Speichern
             </button>
-            <button :key="5" v-if="editingVocabulary" v-on:click="cancel">
+            <button :key="5" v-if="editing" v-on:click="cancel">
                 <i class="material-icons">close</i> Abbrechen
             </button>
-            <input :key="6" type="text" v-if="addingVocabulary" v-model="newVocabulary.lang1" @keyup.enter="addNewVocabulary" :placeholder="activeDictionary.lang1">
-            <input :key="7" type="text" v-if="addingVocabulary" v-model="newVocabulary.lang2" @keyup.enter="addNewVocabulary" :placeholder="activeDictionary.lang2">
-            <input :key="8" type="text" v-if="addingVocabulary" v-model="newVocabulary.note" @keyup.enter="addNewVocabulary" placeholder="Notiz">
-            <input :key="9" type="text" v-if="addingVocabulary" v-model="newVocabulary.category" @keyup.enter="addNewVocabulary" placeholder="Kategorie">
-            <button :key="10" v-if="addingVocabulary" v-on:click="addNewVocabulary">
+            <input :key="6" type="text" v-if="adding" v-model="newVocabulary.lang1" @keyup.enter="addNewVocabulary" :placeholder="activeDictionary.lang1">
+            <input :key="7" type="text" v-if="adding" v-model="newVocabulary.lang2" @keyup.enter="addNewVocabulary" :placeholder="activeDictionary.lang2">
+            <input :key="8" type="text" v-if="adding" v-model="newVocabulary.note" @keyup.enter="addNewVocabulary" placeholder="Notiz">
+            <input :key="9" type="text" v-if="adding" v-model="newVocabulary.category" @keyup.enter="addNewVocabulary" placeholder="Kategorie">
+            <button :key="10" v-if="adding" v-on:click="addNewVocabulary">
                 <i class="material-icons">save</i> Speichern
             </button>
         </transition-group>
@@ -40,13 +40,13 @@
                 </tr>
             </thead>
             <tbody>
-                <tr v-if="!editingVocabulary" :key="index" v-for="(vocabulary, index) in vocabularies">
+                <tr v-if="!editing" :key="index" v-for="(vocabulary, index) in vocabularies">
                     <td>{{ vocabulary.lang1 }}</td>
                     <td>{{ vocabulary.lang2 }}</td>
                     <td>{{ vocabulary.note }}</td>
                     <td>{{ vocabulary.category }}</td>
                 </tr>
-                <tr v-if="editingVocabulary" :key="index" v-for="(vocabulary, index) in vocabularies">
+                <tr v-if="editing" :key="index" v-for="(vocabulary, index) in vocabularies">
                     <td><input type="text" v-model="vocabulary.lang1" @keyup.enter="save" @keyup.esc="cancel" :placeholder="activeDictionary.lang1"></td>
                     <td><input type="text" v-model="vocabulary.lang2" @keyup.enter="save" @keyup.esc="cancel" :placeholder="activeDictionary.lang2"></td>
                     <td><input type="text" v-model="vocabulary.note" @keyup.enter="save" @keyup.esc="cancel" placeholder="Notiz"></td>
@@ -70,8 +70,9 @@ let vocabulary = {
 export default {
     data: function() {
         return {
-            addingVocabulary: false,
-            editingVocabulary: false,
+            adding: false,
+            editing: false,
+            deleting: false,
             filterOn: false,
             filter: { ...vocabulary },
             newVocabulary: { ...vocabulary }
@@ -104,34 +105,41 @@ export default {
         toggleFilter() {
             this.filterOn = !this.filterOn
         },
-        toggleAddingVocabulary() {
-            this.editingVocabulary = false
-            this.addingVocabulary = !this.addingVocabulary
+        toggleAdding() {
+            this.adding = !this.adding
+            this.editing = false
+            this.deleting = false
         },
-        toggleEditingVocabulary() {
-            this.addingVocabulary = false
-            this.editingVocabulary = !this.editingVocabulary
+        toggleEditing() {
+            this.adding = false
+            this.editing = !this.editing
+            this.deleting = false
+        },
+        toggleDeleting() {
+            this.adding = false
+            this.editing = false
+            this.deleting = !this.deleting
         },
         save() {
-            this.editingVocabulary = false
+            this.editing = false
             this.saveState()
         },
         cancel() {
-            this.editingVocabulary = false
-            this.reloadDictionaries()
+            this.editing = false
+            this.loadState()
         },
 
         ...mapActions({
             addVocabulary: 'addVocabulary',
             saveState: 'saveState',
-            reloadDictionaries: 'reloadDictionaries',
+            loadState: 'loadState'
         })
     },
     beforeMount() {
         // TODO: VUEX MIXTURE WITH RELOADING STATE
-        this.reloadDictionaries()
-        Mousetrap.bind('n', () => this.toggleAddingVocabulary())
-        Mousetrap.bind('b', () => this.toggleEditingVocabulary())
+        this.loadState()
+        Mousetrap.bind('n', () => this.toggleAdding())
+        Mousetrap.bind('b', () => this.toggleEditing())
         Mousetrap.bind('f', () => this.toggleFilter())
     }
 }

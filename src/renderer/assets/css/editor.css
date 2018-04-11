@@ -28,6 +28,14 @@ td input[type='text'] {
     border-left: 0;
 }
 
+th button {
+    height: 20px;
+}
+
+tr.delete:hover {
+    color: #ff6666;
+}
+
 .menu-bar input {
     width: 20%;
     margin-bottom: 0;
