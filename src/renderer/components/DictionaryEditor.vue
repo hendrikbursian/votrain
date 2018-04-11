@@ -19,10 +19,15 @@
                 </tr>
             </thead>
             <tbody>
-                <tr v-if="!editing" v-bind:class="{active: dictionary.id === activeDictionaryId, delete: deleting}" :key="index" v-for="(dictionary, index) in dictionaries">
-                    <td v-on:click="deleting ? deleteDictionary(dictionary.id) : openDictionary(dictionary.id)">{{ dictionary.lang1 }}</td>
-                    <td v-on:click="deleting ? deleteDictionary(dictionary.id) : openDictionary(dictionary.id)">{{ dictionary.lang2 }}</td>
-                    <td v-on:click="deleting ? deleteDictionary(dictionary.id) : openDictionary(dictionary.id)">{{ dictionary.vocabularies.length }}</td>
+                <tr v-if="!editing" 
+                    v-bind:class="{active: dictionary.id === activeDictionaryId, delete: deleting}" 
+                    :key="index"
+                    v-for="(dictionary, index) in dictionaries" 
+                    v-on:click="deleting ? deleteDictionary(dictionary.id) : openDictionary(dictionary.id)"
+                >
+                    <td>{{ dictionary.lang1 }}</td>
+                    <td>{{ dictionary.lang2 }}</td>
+                    <td>{{ dictionary.vocabularies.length }}</td>
                 </tr>
                 <tr v-if="editing" v-bind:class="{active: dictionary.id === activeDictionaryId}" :key="index" v-for="(dictionary, index) in dictionaries">
                     <td><input type="text" v-model="dictionary.lang1" @keyup.enter="save" @keyup.esc="cancel" placeholder="Sprache 1" /></td>
@@ -67,10 +72,16 @@ export default {
         save() {
             if (this.adding)
                 this.addDictionary(this.newDictionary)
-                    .then(() => (this.newDictionary = { ...dictionary }))
+                    .then(() => {
+                        this.newDictionary = { ...dictionary }
+                        this.saveState()
+                        this.closeMenus()
+                    })
                     .catch(alert)
-            this.saveState()
-            this.closeMenus()
+            else { // TODO: handle duplicates while editing
+                this.saveState()
+                this.closeMenus()
+            }
         },
         cancel() {
             if (this.adding) this.newDictionary = { ...dictionary }

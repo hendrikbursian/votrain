@@ -110,6 +110,12 @@ export default new Vuex.Store({
                 resolve()
             })
         },
+        deleteVocabulary({ commit }, vocabularyId) {
+            return new Promise(resolve => {
+                commit('DELETE_VOCABULARY_FROM_ACTIVE_DICTIONARY', vocabularyId)
+                resolve()
+            })
+        },
         saveState({ state }) {
             return new Promise(resolve => {
                 localStorage.setItem('store', JSON.stringify(state))
@@ -135,25 +141,30 @@ export default new Vuex.Store({
         },
         ADD_DICTIONARY(state, dictionary) {
             state.dictionaries.push({
-                id:
-                    state.dictionaries.length > 0
-                        ? state.dictionaries[state.dictionaries.length - 1].id +
-                          1
-                        : 0,
+                id: generateId(state.dictionaries),
                 lang1: dictionary.lang1,
                 lang2: dictionary.lang2,
                 vocabularies: []
             })
         },
         DELETE_DICTIONARY(state, dictionaryId) {
-            state.dictionaries = state.dictionaries.filter(function(dic) {
-                return dic.id !== dictionaryId
-            })
+            state.dictionaries = state.dictionaries.filter(
+                dic => dic.id !== dictionaryId
+            )
+        },
+        DELETE_VOCABULARY_FROM_ACTIVE_DICTIONARY(state, vocabularyId) {
+            let dic = state.dictionaries.find(
+                dic => dic.id === state.activeDictionaryId
+            )
+            dic.vocabularies = dic.vocabularies.filter(
+                voc => voc.id !== vocabularyId
+            )
         },
         ADD_VOCABULARY_TO_ACTIVE_DICTIONARY(state, vocabulary) {
             state.dictionaries
                 .find(dic => dic.id === state.activeDictionaryId)
                 .vocabularies.push({
+                    id: generateId(state.dictionaries),
                     lang1: vocabulary.lang1,
                     lang2: vocabulary.lang2,
                     note: vocabulary.note,
@@ -162,3 +173,7 @@ export default new Vuex.Store({
         }
     }
 })
+
+function generateId(arr) {
+    return arr.length > 0 ? arr[arr.length - 1].id + 1 : 0
+}

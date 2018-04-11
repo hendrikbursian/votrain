@@ -1,28 +1,17 @@
 <template>
     <div>
         <transition-group tag="div" class="menu-bar u-full-width" name="slideLeft-fade">
-            <button :key="1" v-on:click="toggleFilter">
-                <i class="material-icons">{{ filterOn ? 'close' : 'filter_list' }}</i> {{ filterOn ? 'Abbrechen' : 'Filter' }}
-            </button>
-            <button :key="2" v-on:click="toggleAdding">
-                <i class="material-icons">{{ adding ? 'close' : 'add' }}</i> {{ adding ? 'Abbrechen' : 'Neue Vokabel' }}
-            </button>
-            <button :key="3" v-if="!adding && !editing" v-on:click="toggleEditing">
-                <i class="material-icons">edit</i> Vokabeln bearbeiten
-            </button>
-            <button :key="4" v-if="editing" v-on:click="save">
-                <i class="material-icons">save</i> Speichern
-            </button>
-            <button :key="5" v-if="editing" v-on:click="cancel">
-                <i class="material-icons">close</i> Abbrechen
-            </button>
-            <input :key="6" type="text" v-if="adding" v-model="newVocabulary.lang1" @keyup.enter="addNewVocabulary" :placeholder="activeDictionary.lang1">
-            <input :key="7" type="text" v-if="adding" v-model="newVocabulary.lang2" @keyup.enter="addNewVocabulary" :placeholder="activeDictionary.lang2">
-            <input :key="8" type="text" v-if="adding" v-model="newVocabulary.note" @keyup.enter="addNewVocabulary" placeholder="Notiz">
-            <input :key="9" type="text" v-if="adding" v-model="newVocabulary.category" @keyup.enter="addNewVocabulary" placeholder="Kategorie">
-            <button :key="10" v-if="adding" v-on:click="addNewVocabulary">
-                <i class="material-icons">save</i> Speichern
-            </button>
+            <button :key="0" v-on:click="filterOn = !filterOn"><i class="material-icons">{{ filterOn ? 'close' : 'filter_list' }}</i> {{ filterOn ? 'Abbrechen' : 'Filtern' }}</button>
+            <button :key="1" v-if="!adding" v-on:click="closeMenus();adding = true"><i class="material-icons">add</i> Neue Vokabel</button>
+            <button :key="2" v-if="!editing" v-on:click="closeMenus();editing = true"><i class="material-icons">edit</i> Vokabeln bearbeiten</button>
+            <button :key="3" v-if="!deleting" v-on:click="closeMenus();deleting = true"><i class="material-icons">delete</i> Vokabeln löschen</button>
+            <button :key="4" v-if="adding || editing || deleting" v-on:click="cancel"><i class="material-icons">close</i> Abbrechen</button>
+            <input :key="5" type="text" v-if="adding" v-model="newVocabulary.lang1" @keyup.esc="adding = false" @keyup.enter="save" :placeholder="activeDictionary.lang1">
+            <input :key="6" type="text" v-if="adding" v-model="newVocabulary.lang2" @keyup.esc="adding = false" @keyup.enter="save" :placeholder="activeDictionary.lang2">
+            <input :key="7" type="text" v-if="adding" v-model="newVocabulary.note" @keyup.esc="adding = false" @keyup.enter="save" placeholder="Notiz">
+            <input :key="8" type="text" v-if="adding" v-model="newVocabulary.category" @keyup.esc="adding = false" @keyup.enter="save" placeholder="Kategorie">
+            <button :key="9" v-if="adding || editing || deleting" v-on:click="save"><i class="material-icons">save</i> Speichern</button>
+            <button :key="10" v-if="deleting" v-on:click="deleteAll"><i class="material-icons">{{ filterOn ? 'delete_sweep' : 'delete_forever' }}</i> {{ filterOn ? 'Gefilterte Löschen' : 'Alle löschen' }}</button>
         </transition-group>
         <table class="u-full-width">
             <thead>
@@ -40,7 +29,12 @@
                 </tr>
             </thead>
             <tbody>
-                <tr v-if="!editing" :key="index" v-for="(vocabulary, index) in vocabularies">
+                <tr v-if="!editing"
+                    v-bind:class="{ delete: deleting }"
+                    :key="index"
+                    v-for="(vocabulary, index) in vocabularies"
+                    v-on:click="deleting ? deleteVocabulary(vocabulary.id) : noop"
+                >
                     <td>{{ vocabulary.lang1 }}</td>
                     <td>{{ vocabulary.lang2 }}</td>
                     <td>{{ vocabulary.note }}</td>
@@ -97,50 +91,51 @@ export default {
         })
     },
     methods: {
-        addNewVocabulary() {
-            this.addVocabulary(this.newVocabulary)
-                .then(() => (this.newVocabulary = { ...vocabulary }))
-                .catch(alert)
-        },
-        toggleFilter() {
-            this.filterOn = !this.filterOn
-        },
-        toggleAdding() {
-            this.adding = !this.adding
-            this.editing = false
-            this.deleting = false
-        },
-        toggleEditing() {
-            this.adding = false
-            this.editing = !this.editing
-            this.deleting = false
-        },
-        toggleDeleting() {
+        closeMenus() {
             this.adding = false
             this.editing = false
-            this.deleting = !this.deleting
+            this.deleting = false
+            this.loadState() // If menu is not close because of canceling (keybind / click on button)
         },
         save() {
-            this.editing = false
+            if (this.adding)
+                this.addVocabulary(this.newVocabulary)
+                    .then(() => (this.newVocabulary = { ...vocabulary }))
+                    .catch(alert)
             this.saveState()
+            this.closeMenus()
         },
         cancel() {
-            this.editing = false
+            if (this.adding) this.newVocabulary = { ...vocabulary }
+            this.closeMenus()
             this.loadState()
+        },
+        deleteAll() {
+            this.vocabularies.forEach(voc => this.deleteVocabulary(voc.id))
         },
 
         ...mapActions({
             addVocabulary: 'addVocabulary',
+            deleteVocabulary: 'deleteVocabulary',
             saveState: 'saveState',
             loadState: 'loadState'
         })
     },
     beforeMount() {
-        // TODO: VUEX MIXTURE WITH RELOADING STATE
         this.loadState()
-        Mousetrap.bind('n', () => this.toggleAdding())
-        Mousetrap.bind('b', () => this.toggleEditing())
-        Mousetrap.bind('f', () => this.toggleFilter())
+        Mousetrap.bind(
+            'n',
+            () => (this.adding ? this.cancel() : (this.adding = true))
+        )
+        Mousetrap.bind(
+            'b',
+            () => (this.editing ? this.cancel() : (this.editing = true))
+        )
+        Mousetrap.bind(
+            'l',
+            () => (this.deleting ? this.cancel() : (this.deleting = true))
+        )
+        Mousetrap.bind('f', () => (this.filterOn = !this.filterOn))
     }
 }
 </script>
