@@ -37,8 +37,8 @@ export default new Vuex.Store({
                     if (
                         !getters.activeDictionary.vocabularies.find(
                             voc =>
-                                voc.lang1 == vocabulary.lang1 ||
-                                voc.lang2 == vocabulary.lang2
+                                voc.lang1 === vocabulary.lang1 ||
+                                voc.lang2 === vocabulary.lang2
                         )
                     ) {
                         commit(
