@@ -6,8 +6,8 @@
     top: 8em;
     background: #fff;
 }
-table {
-    margin-top: 2.6em;
+.editor-area {
+    margin-top: 3em;
 }
 tbody tr.active {
     background: #ddd;

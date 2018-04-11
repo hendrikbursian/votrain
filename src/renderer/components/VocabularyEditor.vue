@@ -13,41 +13,43 @@
             <button :key="9" v-if="adding || editing || deleting" v-on:click="save"><i class="material-icons">save</i> Speichern</button>
             <button :key="10" v-if="deleting" v-on:click="deleteAll"><i class="material-icons">{{ filterOn ? 'delete_sweep' : 'delete_forever' }}</i> {{ filterOn ? 'Gefilterte Löschen' : 'Alle löschen' }}</button>
         </transition-group>
-        <table class="u-full-width">
-            <thead>
-                <tr v-if="!filterOn">
-                    <th style="width:25%">{{ activeDictionary.lang1 }}</th>
-                    <th style="width:25%">{{ activeDictionary.lang2 }}</th>
-                    <th style="width:25%">Notiz</th>
-                    <th style="width:25%">Kategorie</th>
-                </tr>
-                <tr v-if="filterOn">
-                    <th style="width:25%"><input type="text" v-model="filter.lang1" :placeholder="activeDictionary.lang1"></th>
-                    <th style="width:25%"><input type="text" v-model="filter.lang2" :placeholder="activeDictionary.lang2"></th>
-                    <th style="width:25%"><input type="text" v-model="filter.note" placeholder="Notiz"></th>
-                    <th style="width:25%"><input type="text" v-model="filter.category" placeholder="Kategorie"></th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-if="!editing"
-                    v-bind:class="{ delete: deleting }"
-                    :key="vocabulary.id"
-                    v-for="vocabulary in vocabularies"
-                    v-on:click="deleting ? deleteVocabulary(vocabulary.id) : ()=>{}"
-                >
-                    <td>{{ vocabulary.lang1 }}</td>
-                    <td>{{ vocabulary.lang2 }}</td>
-                    <td>{{ vocabulary.note }}</td>
-                    <td>{{ vocabulary.category }}</td>
-                </tr>
-                <tr v-if="editing" :key="vocabulary.id" v-for="vocabulary in vocabularies">
-                    <td><input type="text" v-model="vocabulary.lang1" @keyup.enter="save" @keyup.esc="cancel" :placeholder="activeDictionary.lang1"></td>
-                    <td><input type="text" v-model="vocabulary.lang2" @keyup.enter="save" @keyup.esc="cancel" :placeholder="activeDictionary.lang2"></td>
-                    <td><input type="text" v-model="vocabulary.note" @keyup.enter="save" @keyup.esc="cancel" placeholder="Notiz"></td>
-                    <td><input type="text" v-model="vocabulary.category" @keyup.enter="save" @keyup.esc="cancel" placeholder="Kategorie"></td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="editor-area">
+            <table class="u-full-width">
+                <thead>
+                    <tr v-if="!filterOn">
+                        <th style="width:25%">{{ activeDictionary.lang1 }}</th>
+                        <th style="width:25%">{{ activeDictionary.lang2 }}</th>
+                        <th style="width:25%">Notiz</th>
+                        <th style="width:25%">Kategorie</th>
+                    </tr>
+                    <tr v-if="filterOn">
+                        <th style="width:25%"><input type="text" v-model="filter.lang1" :placeholder="activeDictionary.lang1"></th>
+                        <th style="width:25%"><input type="text" v-model="filter.lang2" :placeholder="activeDictionary.lang2"></th>
+                        <th style="width:25%"><input type="text" v-model="filter.note" placeholder="Notiz"></th>
+                        <th style="width:25%"><input type="text" v-model="filter.category" placeholder="Kategorie"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-if="!editing"
+                        v-bind:class="{ delete: deleting }"
+                        :key="vocabulary.id"
+                        v-for="vocabulary in vocabularies"
+                        v-on:click="deleting ? deleteVocabulary(vocabulary.id) : ()=>{}"
+                    >
+                        <td>{{ vocabulary.lang1 }}</td>
+                        <td>{{ vocabulary.lang2 }}</td>
+                        <td>{{ vocabulary.note }}</td>
+                        <td>{{ vocabulary.category }}</td>
+                    </tr>
+                    <tr v-if="editing" :key="vocabulary.id" v-for="vocabulary in vocabularies">
+                        <td><input type="text" v-model="vocabulary.lang1" @keyup.enter="save" @keyup.esc="cancel" :placeholder="activeDictionary.lang1"></td>
+                        <td><input type="text" v-model="vocabulary.lang2" @keyup.enter="save" @keyup.esc="cancel" :placeholder="activeDictionary.lang2"></td>
+                        <td><input type="text" v-model="vocabulary.note" @keyup.enter="save" @keyup.esc="cancel" placeholder="Notiz"></td>
+                        <td><input type="text" v-model="vocabulary.category" @keyup.enter="save" @keyup.esc="cancel" placeholder="Kategorie"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </template>
 
