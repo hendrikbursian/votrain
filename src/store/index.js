@@ -152,13 +152,6 @@ export default new Vuex.Store({
                 dic => dic.id !== dictionaryId
             )
         },
-        DELETE_VOCABULARY_FROM_ACTIVE_DICTIONARY(state, vocabularyId) {
-            let dic = state.dictionaries.find(
-                dic => dic.id === state.activeDictionaryId
-            )
-            dic.vocabularies = dic.vocabularies.filter(
-                voc => voc.id !== vocabularyId
-            )
         },
         ADD_VOCABULARY_TO_ACTIVE_DICTIONARY(state, vocabulary) {
             state.dictionaries
@@ -170,6 +163,14 @@ export default new Vuex.Store({
                     note: vocabulary.note,
                     category: vocabulary.category
                 })
+        },
+        DELETE_VOCABULARY_FROM_ACTIVE_DICTIONARY(state, vocabularyId) {
+            let dic = state.dictionaries.find(
+                dic => dic.id === state.activeDictionaryId
+            )
+            dic.vocabularies = dic.vocabularies.filter(
+                voc => voc.id !== vocabularyId
+            )
         }
     }
 })
