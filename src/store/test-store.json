@@ -1,0 +1,86 @@
+{
+    "activeDictionaryId": 0,
+    "activeBoxId": 1,
+    "dictionaries": [
+        {
+            "id": 0,
+            "lang1": "Deutsch",
+            "lang2": "Englisch",
+            "vocabularies": [
+                {
+                    "id": 0,
+                    "lang1": "gut",
+                    "lang2": "good",
+                    "note": "",
+                    "categoryId": 1
+                },
+                {
+                    "id": 1,
+                    "lang1": "bad",
+                    "lang2": "böse",
+                    "note": "",
+                    "categoryId": 1
+                },
+                {
+                    "id": 2,
+                    "lang1": "heiß",
+                    "lang2": "hot",
+                    "note": "",
+                    "categoryId": 1
+                },
+                {
+                    "id": 3,
+                    "lang1": "cold",
+                    "lang2": "kalt",
+                    "note": "",
+                    "categoryId": 1
+                },
+                {
+                    "id": 4,
+                    "lang1": "Hund",
+                    "lang2": "Dog",
+                    "note": "",
+                    "categoryId": 2
+                },
+                {
+                    "id": 5,
+                    "lang1": "Katze",
+                    "lang2": "Cat",
+                    "note": "",
+                    "categoryId": 2
+                },
+                {
+                    "id": 6,
+                    "lang1": "Morgen",
+                    "lang2": "tomorrow",
+                    "note": "",
+                    "categoryId": 0
+                },
+                {
+                    "id": 7,
+                    "lang1": "Zeit",
+                    "lang2": "time",
+                    "note": "",
+                    "categoryId": 0
+                },
+                {
+                    "id": 8,
+                    "lang1": "Hai",
+                    "lang2": "Shark",
+                    "note": "",
+                    "categoryId": 2
+                }
+            ]
+        },
+        { "id": 1, "lang1": "Deutsch", "lang2": "Spanisch", "vocabularies": [] }
+    ],
+    "categories": [
+        { "id": 0, "name": "Subjektive" },
+        { "id": 1, "name": "Adjektive" },
+        { "id": 2, "name": "Tiere" }
+    ],
+    "boxes": [
+        { "id": 0, "age": "12", "categoryId": 2 },
+        { "id": 1, "age": "5", "categoryId": 1 }
+    ]
+}
