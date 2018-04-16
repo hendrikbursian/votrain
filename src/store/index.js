@@ -5,7 +5,9 @@ Vue.use(Vuex)
 
 const defaultState = {
     activeDictionaryId: -1,
+    activeBoxId: -1,
     dictionaries: [],
+    categories: {},
     boxes: []
 }
 
@@ -19,42 +21,199 @@ function getLocalState() {
 export default new Vuex.Store({
     state: getLocalState(),
     getters: {
-        activeDictionary(state) {
-            return state.dictionaries.find(
+        activeDictionary: state =>
+            state.dictionaries.find(
                 dictionary => dictionary.id === state.activeDictionaryId
+            ),
+        vocabulariesForBox: (state, getters) => boxId => {
+            let box = state.boxes.find(box => box.id === boxId)
+            return getters.activeDictionary.vocabularies.filter(
+                voc => (box.category ? box.category === voc.category : true)
             )
+        },
+        vocabularyCountInCategory: state => categoryId => {
+            let count = 0
+            state.dictionaries.forEach(
+                dic =>
+                    (count += dic.vocabularies.filter(
+                        voc => voc.categoryId === categoryId
+                    ).length)
+            )
+            return count
+        },
+        categoryName: state => categoryId => {
+            return state.categories[categoryId]
+        },
+        categoryId: state => categoryName => {
+            let id = Object.keys(state.categories).find(
+                id =>
+                    state.categories[id].toLowerCase() ===
+                    categoryName.toLowerCase()
+            )
+            return id ? id : -1
         }
     },
 
     actions: {
-        addVocabulary({ commit, dispatch, getters, state }, vocabulary) {
+        setActiveBoxId({ commit, dispatch }, boxId) {
+            return new Promise(resolve => {
+                commit('SET_ACTIVE_BOX_ID', boxId)
+                resolve()
+            })
+        },
+        setActiveDictionaryId({ commit, dispatch }, dictionaryId) {
+            return new Promise(resolve => {
+                commit('SET_ACTIVE_DICTIONARY_ID', dictionaryId)
+                resolve()
+            })
+        },
+        setCategories({ commit }, categories) {
+            return new Promise((resolve, reject) => {
+                let duplicates = []
+                Object.values(categories).forEach((cat, index, arr) => {
+                    if (!cat)
+                        return reject(
+                            'Es sind nicht alle erforderlichen Angaben enthalten.'
+                        )
+                    if (arr.lastIndexOf(cat) !== index) duplicates.push(cat)
+                })
+
+                if (duplicates.length > 0)
+                    reject(
+                        `Folgende Kategorien sind doppelt. Bitte pass sie an\n\n${duplicates
+                            .map(dup => `--> ${dup}`)
+                            .join('\n')}`
+                    )
+
+                commit('SET_CATEGORIES', categories)
+                resolve()
+            })
+        },
+        setDictionaries({ commit }, dictionaries) {
+            return new Promise((resolve, reject) => {
+                if (dictionaries.find(dic => !dic.lang1 || !dic1.lang2))
+                    return reject(
+                        'Die Wörterbücher enthalten nicht alle erforderlichen Angaben.'
+                    )
+
+                let duplicates = dictionaries.filter(dic1 => {
+                    return (
+                        dictionaries.find(
+                            dic2 =>
+                                (dic1.id !== dic2.id &&
+                                    (dic1.lang1 === dic2.lang1 &&
+                                        dic1.lang2 === dic2.lang2)) ||
+                                (dic1.lang1 === dic2.lang2 &&
+                                    dic1.lang2 === dic2.lang1)
+                        ) !== undefined
+                    )
+                })
+
+                if (duplicates.length > 0)
+                    return reject(
+                        `Folgende Wörterbücher sind doppelt. Bitte pass sie an\n\n${duplicates
+                            .map(dup => `--> ${dup.lang1} / ${dup.lang2}`)
+                            .join('\n')}`
+                    )
+
+                commit('SET_DICTIONARIES', dictionaries)
+                resolve()
+            })
+        },
+        setVocabularies({ commit, dispatch, getters, state }, vocabularies) {
             return new Promise((resolve, reject) => {
                 if (
-                    vocabulary.lang1 &&
-                    vocabulary.lang2 &&
-                    vocabulary.category
-                ) {
-                    if (
-                        !getters.activeDictionary.vocabularies.find(
-                            voc =>
-                                voc.lang1 === vocabulary.lang1 ||
-                                voc.lang2 === vocabulary.lang2
-                        )
-                    ) {
-                        commit(
-                            'ADD_VOCABULARY_TO_ACTIVE_DICTIONARY',
-                            vocabulary
-                        )
-                        dispatch('saveState')
-                        resolve()
-                    } else {
-                        reject('Das Wort ist bereits enthalten')
-                    }
-                } else {
-                    reject(
-                        'Das Wort enthält nicht alle erforderlichen Angaben.'
+                    vocabularies.find(
+                        voc => !voc.lang1 || !voc.lang2 || !voc.category
                     )
+                )
+                    return reject(
+                        'Die Vokabeln enthalten nicht alle erforderlichen Angaben.'
+                    )
+
+                let duplicates = vocabularies.filter(voc1 => {
+                    return (
+                        vocabularies.find(
+                            voc2 =>
+                                voc1.id !== voc2.id &&
+                                (voc1.lang1 === voc2.lang1 &&
+                                    voc1.lang2 === voc2.lang2)
+                        ) !== undefined
+                    )
+                })
+
+                if (duplicates.length > 0)
+                    return reject(
+                        `Folgende Vokabeln sind doppelt. Bitte pass sie an\n\n${duplicates
+                            .map(dup => `--> ${dup.lang1} / ${dup.lang2}`)
+                            .join('\n')}`
+                    )
+
+                let promises = []
+                let categories = Object.values(state.categories).map(cat =>
+                    cat.toLowerCase()
+                )
+
+                vocabularies.forEach(voc => {
+                    if (!categories.includes(voc.category.toLowerCase())) {
+                        categories.push(voc.category.toLowerCase())
+                        promises.push(dispatch('addCategory', voc.category))
+                    }
+                })
+
+                return Promise.all(promises)
+                    .then(() => {
+                        commit(
+                            'SET_VOCABULARIES_FOR_ACTIVE_DICTIONARY',
+                            vocabularies.map(voc => {
+                                return {
+                                    id: voc.id,
+                                    lang1: voc.lang1,
+                                    lang2: voc.lang2,
+                                    note: voc.note,
+                                    categoryId: getters.categoryId(voc.category)
+                                }
+                            })
+                        )
+                    })
+                    .then(resolve)
+            })
+        },
+        addBox({ commit, dispatch, state }, box) {
+            return new Promise((resolve, reject) => {
+                box.categoryId = getters.categoryId(box.category)
+                if (box.categoryId === -1) {
+                    commit('ADD_CATEGORY', box.category)
+                    box.categoryId = getters.categoryId(box.category)
                 }
+
+                if (
+                    !state.boxes.find(
+                        b =>
+                            b.age === box.age &&
+                            b.categoryId === box.categoryId &&
+                            b.limit === box.limit
+                    )
+                ) {
+                    commit('ADD_BOX', box)
+                    dispatch('saveState')
+                    resolve()
+                } else {
+                    reject('Der Karteikasten ist bereits enthalten.')
+                }
+            })
+        },
+        addCategory({ state, commit, getters }, categoryName) {
+            return new Promise((resolve, reject) => {
+                if (
+                    Object.values(state.categories).find(
+                        cat => cat === categoryName
+                    )
+                )
+                    return reject('Die Kategorie ist bereits enthalten.')
+
+                commit('ADD_CATEGORY', categoryName)
+                resolve(getters.categoryId(categoryName))
             })
         },
         addDictionary({ commit, dispatch, state }, dictionary) {
@@ -63,8 +222,10 @@ export default new Vuex.Store({
                     if (
                         !state.dictionaries.find(
                             dic =>
-                                dic.lang1 == dictionary.lang1 &&
-                                dic.lang2 == dictionary.lang2
+                                (dic.lang1 === dictionary.lang1 &&
+                                    dic.lang2 === dictionary.lang2) ||
+                                (dic.lang1 === dictionary.lang2 &&
+                                    dic.lang2 === dictionary.lang1)
                         )
                     ) {
                         commit('ADD_DICTIONARY', dictionary)
@@ -73,7 +234,7 @@ export default new Vuex.Store({
                         dispatch('saveState')
                         resolve()
                     } else {
-                        reject('Das Wörterbuch ist bereits enthalten')
+                        reject('Das Wörterbuch ist bereits enthalten.')
                     }
                 } else {
                     reject(
@@ -82,9 +243,60 @@ export default new Vuex.Store({
                 }
             })
         },
-        setActiveDictionaryId({ commit, dispatch }, dictionaryId) {
+        addVocabulary({ commit, dispatch, getters, state }, vocabulary) {
+            return new Promise((resolve, reject) => {
+                if (
+                    !vocabulary.lang1 ||
+                    !vocabulary.lang2 ||
+                    !vocabulary.category
+                )
+                    return reject(
+                        'Die Vokabel enthält nicht alle erforderlichen Angaben.'
+                    )
+
+                if (
+                    getters.activeDictionary.vocabularies.find(
+                        voc =>
+                            voc.lang1 === vocabulary.lang1 &&
+                            voc.lang2 === vocabulary.lang2
+                    )
+                )
+                    return reject('Die Vokabel ist bereits enthalten.')
+
+                vocabulary.categoryId = getters.categoryId(vocabulary.category)
+                if (vocabulary.categoryId === -1) {
+                    return dispatch('addCategory', vocabulary.category)
+                        .then(categoryId => {
+                            vocabulary.categoryId = categoryId
+                            commit(
+                                'ADD_VOCABULARY_TO_ACTIVE_DICTIONARY',
+                                vocabulary
+                            )
+                        })
+                        .then(dispatch('saveState'))
+                        .then(resolve)
+                        .catch(reject)
+                } else {
+                    commit('ADD_VOCABULARY_TO_ACTIVE_DICTIONARY', vocabulary)
+                    dispatch('saveState')
+                    resolve()
+                }
+            })
+        },
+        deleteBox({ commit }, boxId) {
             return new Promise(resolve => {
-                commit('SET_ACTIVE_DICTIONARY_ID', dictionaryId)
+                commit('DELETE_BOX', boxId)
+                resolve()
+            })
+        },
+        deleteCategory({ commit, getters }, categoryId) {
+            return new Promise((resolve, reject) => {
+                if (getters.vocabularyCountInCategory(categoryId) > 0)
+                    return reject(
+                        'Die Kategorie muss leer sein, bevor sie gelöscht wird. Entferne die entsprechenden Vokabeln, um sie zu löschen.'
+                    )
+
+                commit('DELETE_CATEGORY', categoryId)
                 resolve()
             })
         },
@@ -122,22 +334,48 @@ export default new Vuex.Store({
                 resolve()
             })
         },
-        loadState({ state, commit }) {
+        loadState({ commit, state }) {
             return new Promise(resolve => {
-                commit('UPDATE_STATE', getLocalState())
+                commit('SET_STATE', getLocalState())
                 resolve()
             })
         }
     },
 
     mutations: {
-        UPDATE_STATE(state, stateUpdate) {
+        SET_ACTIVE_DICTIONARY_ID(state, dictionaryId) {
+            state.activeDictionaryId = dictionaryId
+        },
+        SET_ACTIVE_BOX_ID(state, boxId) {
+            state.activeBoxId = boxId
+        },
+        SET_CATEGORIES(state, categories) {
+            state.categories = categories
+        },
+        SET_DICTIONARIES(state, dictionaries) {
+            state.dictionaries = dictionaries
+        },
+        SET_STATE(state, stateUpdate) {
             Object.keys(defaultState).forEach(
                 key => (state[key] = stateUpdate[key])
             )
         },
-        SET_ACTIVE_DICTIONARY_ID(state, dictionaryId) {
-            state.activeDictionaryId = dictionaryId
+        SET_VOCABULARIES_FOR_ACTIVE_DICTIONARY(state, vocabularies) {
+            let activeDictionary = state.dictionaries.find(
+                dic => dic.id === state.activeDictionaryId
+            )
+            activeDictionary.vocabularies = vocabularies
+        },
+        ADD_BOX(state, box) {
+            state.boxes.push({
+                id: generateId(state.boxes),
+                age: box.age,
+                categoryId: box.categoryId,
+                count: box.count
+            })
+        },
+        ADD_CATEGORY(state, categoryName) {
+            state.categories[generateId(state.categories)] = categoryName
         },
         ADD_DICTIONARY(state, dictionary) {
             state.dictionaries.push({
@@ -147,22 +385,32 @@ export default new Vuex.Store({
                 vocabularies: []
             })
         },
+        ADD_VOCABULARY_TO_ACTIVE_DICTIONARY(state, vocabulary) {
+            let activeDictionary = state.dictionaries.find(
+                dic => dic.id === state.activeDictionaryId
+            )
+            activeDictionary.vocabularies.push({
+                id: generateId(activeDictionary.vocabularies),
+                lang1: vocabulary.lang1,
+                lang2: vocabulary.lang2,
+                note: vocabulary.note,
+                categoryId: vocabulary.categoryId
+            })
+        },
+        DELETE_BOX(state, boxId) {
+            state.boxes = state.boxes.filter(box => box.id !== boxId)
+        },
+        DELETE_CATEGORY(state, categoryId) {
+            let categories = {}
+            Object.keys(state.categories).forEach(key => {
+                if (key !== categoryId) categories[key] = state.categories[key]
+            })
+            state.categories =  categories
+        },
         DELETE_DICTIONARY(state, dictionaryId) {
             state.dictionaries = state.dictionaries.filter(
                 dic => dic.id !== dictionaryId
             )
-        },
-        },
-        ADD_VOCABULARY_TO_ACTIVE_DICTIONARY(state, vocabulary) {
-            state.dictionaries
-                .find(dic => dic.id === state.activeDictionaryId)
-                .vocabularies.push({
-                    id: generateId(state.dictionaries),
-                    lang1: vocabulary.lang1,
-                    lang2: vocabulary.lang2,
-                    note: vocabulary.note,
-                    category: vocabulary.category
-                })
         },
         DELETE_VOCABULARY_FROM_ACTIVE_DICTIONARY(state, vocabularyId) {
             let dic = state.dictionaries.find(
@@ -175,6 +423,11 @@ export default new Vuex.Store({
     }
 })
 
-function generateId(arr) {
-    return arr.length > 0 ? arr[arr.length - 1].id + 1 : 0
+function generateId(item) {
+    if (item instanceof Array)
+        return item.length > 0 ? item[item.length - 1].id + 1 : 0
+    if (item instanceof Object) {
+        let ids = Object.keys(item)
+        return ids.length > 0 ? parseInt(ids.slice(-1)) + 1 : 0
+    }
 }

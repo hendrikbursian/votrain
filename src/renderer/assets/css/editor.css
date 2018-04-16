@@ -8,6 +8,7 @@
 }
 .display-area {
     margin-top: 3em;
+    height: 100%;
 }
 tbody tr.active {
     background: #ddd;
@@ -43,6 +44,22 @@ tr.delete:hover {
 
 .menu-bar > :last-child {
     margin-right: 0;
+}
+
+.autocomplete__dropdown {
+    position: relative;
+    top: 38px;
+    left: 10px;
+    width: 0;
+}
+
+.autocomplete__item {
+    color: #888;
+}
+
+.autocomplete__item:hover {
+    color: #333;
+    cursor: pointer;
 }
 
 button i {

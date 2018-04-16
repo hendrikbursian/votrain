@@ -6,10 +6,11 @@
                 <h5>Navigation</h5>
                 <ul class="shortcut-list">
                     <li><b>1</b> - Wörterbücher</li>
-                    <li><b>2</b> - Vokabeln</li>
-                    <li><b>3</b> - Karteikästen</li>
-                    <li><b>4</b> - Lernen</li>
-                    <li><b>5</b> - Hilfe</li>
+                    <li><b>2</b> - Kategorien</li>
+                    <li><b>3</b> - Vokabeln</li>
+                    <li><b>4</b> - Karteikästen</li>
+                    <li><b>5</b> - Lernen</li>
+                    <li><b>6</b> - Hilfe</li>
                 </ul>
             </div>
             <div class="column">
@@ -21,12 +22,29 @@
                 </ul>
             </div>
             <div class="column">
+                <h5>Kategorien</h5>
+                <ul class="shortcut-list">
+                    <li><b>N</b> - Neue Kategorie</li>
+                    <li><b>B</b> - Kategorien bearbeiten</li>
+                </ul>
+            </div>
+            <div class="column">
                 <h5>Vokabeln</h5>
                 <ul class="shortcut-list">
                     <li><b>N</b> - Neue Vokabel</li>
                     <li><b>B</b> - Vokabeln bearbeiten</li>
                     <li><b>F</b> - Vokabeln filtern</li>
                     <li><b>L</b> - Vokabeln löschen</li>
+                </ul>
+            </div>       
+        </div>
+        <div class="row">
+            <div class="column">
+                <h5>Karteikästen</h5>
+                <ul class="shortcut-list">
+                    <li><b>N</b> - Neuer Karteikasten</li>
+                    <li><b>B</b> - Karteikästen bearbeiten</li>
+                    <li><b>L</b> - Karteikästen löschen</li>
                 </ul>
             </div>       
         </div>
@@ -50,7 +68,8 @@ export default {
 }
 </script>
 <style scoped>
-h4, h5 {
+h4,
+h5 {
     margin-bottom: 1em;
 }
 .row {

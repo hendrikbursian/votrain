@@ -11,9 +11,10 @@
         </div>
         <nav>
             <router-link to="dictionaries">Wörterbücher</router-link>
-            <router-link v-if="showVocabulariesNav" to="vocabularies">Vokabeln</router-link>
+            <router-link to="categories">Kategorien</router-link>
+            <router-link v-if="adi !== -1" to="vocabularies">Vokabeln</router-link>
             <router-link to="boxes">Karteikästen</router-link>
-            <router-link v-if="showLearningNav" to="learning">Lernen</router-link>
+            <router-link v-if="adi !== -1 && activeDictionary.vocabularies.length > 0 && boxes.length > 0" to="learning">Lernen</router-link>
             <router-link to="help">Hilfe</router-link>
         </nav>
     </header>
@@ -41,17 +42,6 @@ export default {
         ...mapGetters({
             activeDictionary: 'activeDictionary'
         }),
-
-        showVocabulariesNav() {
-            return this.adi !== -1
-        },
-        showLearningNav() {
-            return (
-                this.showVocabulariesNav &&
-                this.activeDictionary.vocabularies.length > 0 &&
-                this.boxes.length > 0
-            )
-        },
         activeDictionaryId: {
             get() {
                 return this.adi
@@ -70,27 +60,12 @@ export default {
         })
     },
     beforeMount() {
-        Mousetrap.bind('1', () => {
-            this.$router.push('dictionaries')
-        })
-        Mousetrap.bind('2', () => {
-            if (this.showVocabulariesNav) this.$router.push('vocabularies')
-            else
-                alert(
-                    'Bevor du Vokabeln anzeigen kannst brauchst du ein Wörterbuch. Lege eins im entsprechenden Reiter an und leg los!'
-                )
-        })
-        Mousetrap.bind('3', () => this.$router.push('boxes'))
-        Mousetrap.bind('4', () => {
-            if (this.showLearningNav) this.$router.push('learning')
-            else
-                alert(
-                    'Bevor du lernen kannst brauchst du ein Wörterbuch mit Vokabeln und Karteikästen. Lege sie in den entsprechenden Reitern an und leg los!'
-                )
-        })
-        Mousetrap.bind('5', () => {
-            this.$router.push('help')
-        })
+        Mousetrap.bind('1', () => this.$router.push('dictionaries'))
+        Mousetrap.bind('2', () => this.$router.push('categories'))
+        Mousetrap.bind('3', () => this.$router.push('vocabularies'))
+        Mousetrap.bind('4', () => this.$router.push('boxes'))
+        Mousetrap.bind('5', () => this.$router.push('learning'))
+        Mousetrap.bind('6', () => this.$router.push('help'))
     },
     created() {
         if (this.adi === -1)
