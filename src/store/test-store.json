@@ -1,6 +1,6 @@
 {
     "activeDictionaryId": 0,
-    "activeBoxId": 5,
+    "activeBoxId": 6,
     "dictionaries": [
         {
             "id": 0,
@@ -13,9 +13,9 @@
                     "lang2": "Man",
                     "note": "Mann",
                     "categoryId": "0",
-                    "seenCount": 33,
-                    "correctCount": 28,
-                    "lastSeen": "2018-04-16T22:51:39.418Z"
+                    "seenCount": 50,
+                    "correctCount": 45,
+                    "lastSeen": "2018-04-16T23:26:05.605Z"
                 },
                 {
                     "id": 1,
@@ -23,9 +23,9 @@
                     "lang2": "Women",
                     "note": "",
                     "categoryId": "0",
-                    "seenCount": 32,
-                    "correctCount": 15,
-                    "lastSeen": "2018-04-16T23:12:45.667Z"
+                    "seenCount": 202,
+                    "correctCount": 179,
+                    "lastSeen": "2018-04-16T23:26:41.429Z"
                 },
                 {
                     "id": 2,
@@ -33,14 +33,14 @@
                     "lang2": "Child",
                     "note": "",
                     "categoryId": "0",
-                    "seenCount": 26,
-                    "correctCount": 21,
-                    "lastSeen": "2018-04-16T22:51:42.383Z"
+                    "seenCount": 50,
+                    "correctCount": 45,
+                    "lastSeen": "2018-04-16T23:26:08.836Z"
                 }
             ]
         }
     ],
-    "categories": { "0": "People" },
+    "categories": { "0": "People", "1": "" },
     "boxes": [
         { "id": 0, "ratio": "", "minAge": "10", "categoryId": "0" },
         { "id": 1, "ratio": "", "minAge": "", "categoryId": "", "limit": "2" },
@@ -53,6 +53,13 @@
             "categoryId": "0",
             "limit": "2"
         },
-        { "id": 5, "minAge": "", "categoryId": "0", "ratio": "50", "limit": "" }
+        {
+            "id": 5,
+            "minAge": "",
+            "categoryId": "0",
+            "ratio": "50",
+            "limit": ""
+        },
+        { "id": 6, "minAge": "", "categoryId": "1", "ratio": "10", "limit": "" }
     ]
 }

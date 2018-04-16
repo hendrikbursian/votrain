@@ -33,11 +33,11 @@ export default new Vuex.Store({
             return getters.activeDictionary.vocabularies.filter(voc => {
                 return (
                     (box.category ? box.category === voc.category : true) &&
-                    (box.minAge
+                    (box.minAge && box.minAge > 0
                         ? box.minAge * 1000 * 60 * 60 * 24 <
                           date - Date.parse(voc.lastSeen)
                         : true) &&
-                    (box.ratio > 0
+                    (box.ratio && box.ratio > 0
                         ? box.ratio <
                           (1 - voc.correctCount / voc.seenCount) * 100
                         : true)
