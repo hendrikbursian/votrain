@@ -86,10 +86,18 @@ export default {
             if (this.filterOn)
                 return this.activeDictionary.vocabularies.filter(voc => {
                     return (
-                        (voc.lang1 || '').search(this.filter.lang1) !== -1 &&
-                        (voc.lang2 || '').search(this.filter.lang2) !== -1 &&
-                        (voc.note || '').search(this.filter.note) !== -1 &&
-                        (voc.category || '').search(this.filter.category) !== -1
+                        voc.lang1
+                            .toLowerCase()
+                            .search(this.filter.lang1.toLowerCase()) !== -1 &&
+                        voc.lang2
+                            .toLowerCase()
+                            .search(this.filter.lang2.toLowerCase()) !== -1 &&
+                        voc.note
+                            .toLowerCase()
+                            .search(this.filter.note.toLowerCase()) !== -1 &&
+                        (voc.category || this.categoryName(voc.categoryId))
+                            .toLowerCase()
+                            .search(this.filter.category.toLowerCase()) !== -1
                     )
                 })
             else return this.activeDictionary.vocabularies
