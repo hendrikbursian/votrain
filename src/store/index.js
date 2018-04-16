@@ -25,11 +25,24 @@ export default new Vuex.Store({
             state.dictionaries.find(
                 dictionary => dictionary.id === state.activeDictionaryId
             ),
+        activeBox: state =>
+            state.boxes.find(box => box.id === state.activeBoxId),
         vocabulariesForBox: (state, getters) => boxId => {
+            let date = Date.now()
             let box = state.boxes.find(box => box.id === boxId)
-            return getters.activeDictionary.vocabularies.filter(
-                voc => (box.category ? box.category === voc.category : true)
-            )
+            return getters.activeDictionary.vocabularies.filter(voc => {
+                return (
+                    (box.category ? box.category === voc.category : true) &&
+                    (box.minAge
+                        ? box.minAge * 1000 * 60 * 60 * 24 <
+                          date - Date.parse(voc.lastSeen)
+                        : true) &&
+                    (box.ratio > 0
+                        ? box.ratio <
+                          (1 - voc.correctCount / voc.seenCount) * 100
+                        : true)
+                )
+            })
         },
         vocabularyCountInCategory: state => categoryId => {
             let count = 0
@@ -55,6 +68,21 @@ export default new Vuex.Store({
     },
 
     actions: {
+        seenVocabulary({ commit, getters }, data) {
+            return new Promise((resolve, reject) => {
+                getters.activeDictionary.vocabularies.find(
+                    voc => voc.id === data.vocabularyId
+                )
+                commit('VOCABULARY_SEEN', data.vocabularyId)
+
+                if (data.isCorrect)
+                    commit(
+                        'INCREASE_VOCABULARY_CORRECT_COUNT',
+                        data.vocabularyId
+                    )
+                resolve()
+            })
+        },
         setActiveBoxId({ commit, dispatch }, boxId) {
             return new Promise(resolve => {
                 commit('SET_ACTIVE_BOX_ID', boxId)
@@ -179,7 +207,7 @@ export default new Vuex.Store({
                     .then(resolve)
             })
         },
-        addBox({ commit, dispatch, state }, box) {
+        addBox({ commit, dispatch, getters, state }, box) {
             return new Promise((resolve, reject) => {
                 box.categoryId = getters.categoryId(box.category)
                 if (box.categoryId === -1) {
@@ -190,8 +218,9 @@ export default new Vuex.Store({
                 if (
                     !state.boxes.find(
                         b =>
-                            b.age === box.age &&
+                            b.minAge === box.minAge &&
                             b.categoryId === box.categoryId &&
+                            b.ratio === box.ratio &&
                             b.limit === box.limit
                     )
                 ) {
@@ -343,6 +372,25 @@ export default new Vuex.Store({
     },
 
     mutations: {
+        VOCABULARY_SEEN(state, vocabularyId) {
+            let activeDictionary = state.dictionaries.find(
+                dic => dic.id === state.activeDictionaryId
+            )
+            let voc = activeDictionary.vocabularies.find(
+                voc => voc.id === vocabularyId
+            )
+            voc.seenCount++
+            voc.lastSeen = new Date()
+        },
+        INCREASE_VOCABULARY_CORRECT_COUNT(state, vocabularyId) {
+            let activeDictionary = state.dictionaries.find(
+                dic => dic.id === state.activeDictionaryId
+            )
+            let voc = activeDictionary.vocabularies.find(
+                voc => voc.id === vocabularyId
+            )
+            voc.correctCount++
+        },
         SET_ACTIVE_DICTIONARY_ID(state, dictionaryId) {
             state.activeDictionaryId = dictionaryId
         },
@@ -369,9 +417,10 @@ export default new Vuex.Store({
         ADD_BOX(state, box) {
             state.boxes.push({
                 id: generateId(state.boxes),
-                age: box.age,
+                minAge: box.minAge,
                 categoryId: box.categoryId,
-                count: box.count
+                ratio: box.ratio,
+                limit: box.limit
             })
         },
         ADD_CATEGORY(state, categoryName) {
@@ -394,7 +443,10 @@ export default new Vuex.Store({
                 lang1: vocabulary.lang1,
                 lang2: vocabulary.lang2,
                 note: vocabulary.note,
-                categoryId: vocabulary.categoryId
+                categoryId: vocabulary.categoryId,
+                seenCount: 0,
+                correctCount: 0,
+                lastSeen: new Date(0)
             })
         },
         DELETE_BOX(state, boxId) {
@@ -405,7 +457,7 @@ export default new Vuex.Store({
             Object.keys(state.categories).forEach(key => {
                 if (key !== categoryId) categories[key] = state.categories[key]
             })
-            state.categories =  categories
+            state.categories = categories
         },
         DELETE_DICTIONARY(state, dictionaryId) {
             state.dictionaries = state.dictionaries.filter(

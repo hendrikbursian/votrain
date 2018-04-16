@@ -5,27 +5,30 @@
             <button :key="2" v-if="!editing" @click="closeMenus();editing = true"><i class="material-icons">edit</i> Karteikästen bearbeiten</button>
             <button :key="3" v-if="!deleting" @click="closeMenus();deleting = true"><i class="material-icons">delete</i> Karteikästen löschen</button>
             <button :key="4" v-if="adding || editing || deleting" @click="cancel"><i class="material-icons">close</i> Abbrechen</button>
-            <input :key="5" type="number" min="0" v-if="adding" v-model="newBox.age" @keyup.esc="adding = false" @keyup.enter="save" placeholder="Alter (Tage)">
+            <input :key="5" type="number" min="0" v-if="adding" v-model="newBox.minAge" @keyup.esc="adding = false" @keyup.enter="save" placeholder="Alter (Tage)">
             <div :key="6" v-if="adding" class="autocomplete__dropdown">
-                <div @click="newBox.category = category" :key="index" v-for="(category, index) in autocompleteCategories">{{ category }}</div>
+                <div class="autocomplete__item" @click="newBox.category = category" :key="index" v-for="(category, index) in autocompleteCategories(newBox.category)">{{ category }}</div>
             </div>
             <input :key="7" type="text" v-if="adding" v-model="newBox.category" @keyup.esc="adding = false" @keyup.enter="save" placeholder="Kategorie">
             <input :key="8" type="number" min="0" v-if="adding" v-model="newBox.limit" @keyup.esc="adding = false" @keyup.enter="save" placeholder="Anzahl">
-            <button :key="9" v-if="adding || editing || deleting" @click="save"><i class="material-icons">save</i> Speichern</button>
-            <button :key="10" v-if="deleting" @click="deleteAll"><i class="material-icons">delete_forever</i> Alle löschen</button>
+            <input :key="9" type="number" min="0" max="100" v-if="adding" v-model="newBox.ratio" @keyup.esc="adding = false" @keyup.enter="save" placeholder="Fehlerrate (%)">
+            <button :key="10" v-if="adding || editing || deleting" @click="save"><i class="material-icons">save</i> Speichern</button>
+            <button :key="11" v-if="deleting" @click="deleteAll"><i class="material-icons">delete_forever</i> Alle löschen</button>
         </transition-group>
         <div class="display-area u-full-width box-editor">
             <div class="box"
+                 v-bind:class="{ delete: deleting }"
                  :key="box.id" 
                  v-for="box in boxes"
                  @click="deleting ? deleteBox(box.id) : openBox(box.id)"
             >
                 <div class="box__parameters">
-                    {{ categoryName(box.categoryId) }}<span v-if="box.categoryId && box.age > 0">&nbsp;-&nbsp;</span>
-                    {{ box.age }} <span v-if="box.age > 0">&nbsp;Tage alt</span><span v-if="box.age > 0 && box.limit > 0">&nbsp;-&nbsp;</span>
-                    {{ box.limit }}<span v-if="box.limit > 0">&nbsp;Vokabeln</span>
+                    <span class="box__parameter">{{ categoryName(box.categoryId) }}</span>
+                    <span class="box__parameter" v-if="box.minAge > 0">{{ `ab ${box.minAge} ${box.minAge === 1 ? 'Tag': 'Tage'}`}}</span>
+                    <span class="box__parameter" v-if="box.ratio > 0">{{ `Fehlerrate > ${box.ratio}%` }}</span>
+                    <span class="box__parameter" v-if="box.limit > 0">{{ `max. ${box.limit} ${box.limit === 1 ? 'Vokabel': 'Vokabeln'}` }}</span>
                 </div>
-                <span class="box__vocabulary-count">{{ vocabulariesForBox(box.id).length }} Vokabeln</span>
+                <span class="box__vocabulary-count">{{ vocabulariesForBox(box.id).length }} {{ vocabulariesForBox(box.id).length === 1 ? 'Vokabel': 'Vokabeln' }}</span>
             </div>
         </div>
     </div>
@@ -36,7 +39,8 @@ import { mapGetters, mapState, mapActions } from 'vuex'
 
 const box = {
     category: '',
-    age: '',
+    minAge: '',
+    ratio: '',
     limit: ''
 }
 
@@ -50,13 +54,6 @@ export default {
         }
     },
     computed: {
-        autocompleteCategories() {
-            if (this.newBox.category) {
-                let re = new RegExp(this.newBox.category, 'i')
-                return this.categories.filter(cat => cat.name.search(re) !== -1)
-            } else return []
-        },
-
         ...mapState({
             boxes: 'boxes',
             categories: 'categories'
@@ -97,6 +94,16 @@ export default {
         deleteAll() {
             this.boxes.forEach(box => this.deleteBox(box.id))
         },
+        autocompleteCategories(query) {
+            if (query) {
+                let re = new RegExp(query, 'i')
+                return Object.values(this.categories).filter(
+                    cat => cat.search(re) !== -1 && cat !== query
+                )
+            } else {
+                return []
+            }
+        },
 
         ...mapActions({
             addBox: 'addBox',
@@ -128,6 +135,7 @@ export default {
 .box-editor {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
 }
 .box {
     display: flex;
@@ -148,8 +156,12 @@ export default {
 .box__parameters {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: center;
+}
+.box__parameter {
+    margin: 0 0.2em;
 }
 .box__vocabulary-count {
     color: #888;

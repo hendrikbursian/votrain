@@ -47,6 +47,14 @@
                     <li><b>L</b> - Karteikästen löschen</li>
                 </ul>
             </div>       
+            <div class="column">
+                <h5>Lernen</h5>
+                <ul class="shortcut-list">
+                    <li><b>Leetaste</b> - Karte umdrehen / Neustart</li>
+                    <li><b>R</b> - Vokabel als richtig markieren</li>
+                    <li><b>F</b> - Vokabel als falsch markieren</li>
+                </ul>
+            </div>       
         </div>
     </div>
 </template>

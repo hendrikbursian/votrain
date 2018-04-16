@@ -33,7 +33,7 @@ th button {
     height: 20px;
 }
 
-tr.delete:hover {
+.delete:hover {
     color: #ff6666;
 }
 

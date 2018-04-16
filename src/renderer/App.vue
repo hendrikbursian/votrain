@@ -48,7 +48,7 @@ export default {
             },
             set(activeDictionaryId) {
                 this.setActiveDictionaryId(activeDictionaryId).then(
-                    this.saveState
+                    () => this.saveState
                 )
             }
         }
