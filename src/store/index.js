@@ -325,6 +325,11 @@ export default new Vuex.Store({
                         'Die Kategorie muss leer sein, bevor sie gelöscht wird. Entferne die entsprechenden Vokabeln, um sie zu löschen.'
                     )
 
+                if (state.boxes.find(box => box.categoryId === categoryId))
+                    return reject(
+                        'Die Kategorie darf nicht mehr von Karteikästen verwendet werden, wenn sie gelöscht wird. Entferne die entsprechenden Karteikästen, um sie zu löschen.'
+                    )
+                    
                 commit('DELETE_CATEGORY', categoryId)
                 resolve()
             })

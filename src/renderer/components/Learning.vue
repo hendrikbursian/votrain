@@ -28,7 +28,7 @@
                 <div class="card__details" >
                     <em class="card__note">Du hast {{ counts.correct }} / {{ counts.total }} richtig</em>
                     <div class="row">
-                        <button v-if="vocabulariesForBox(activeBox.id).length > 0" @click="init">Nochmal probieren</button>
+                        <button v-if="vocabulariesForBox(activeBox.id).length > 0" @click="init">Nochmal</button>
                         <p v-if="!vocabulariesForBox(activeBox.id).length > 0">
                             Glückwunsch!<br>
                             Es sind keine weiteren Vokabeln in diesem Kasten :)
@@ -84,7 +84,7 @@ export default {
         init() {
             this.counts.total = 0
             this.counts.correct = 0
-            this.unseen = false
+            this.unseen = true
 
             this.stack = shuffle(
                 this.vocabulariesForBox(this.activeBox.id)
