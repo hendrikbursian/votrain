@@ -100,7 +100,7 @@ export default {
                             .search(this.filter.category.toLowerCase()) !== -1
                     )
                 })
-            else return this.activeDictionary.vocabularies
+            return this.activeDictionary.vocabularies
         },
 
         ...mapState({

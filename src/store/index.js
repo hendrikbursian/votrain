@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-
 Vue.use(Vuex)
 
 const defaultState = {
@@ -11,15 +10,11 @@ const defaultState = {
     boxes: []
 }
 
-function getLocalState() {
-    return {
-        ...defaultState,
-        ...JSON.parse(localStorage.getItem('store'))
-    }
-}
-
 export default new Vuex.Store({
-    state: getLocalState(),
+    state: Object.assign(
+        defaultState,
+        JSON.parse(localStorage.getItem('store'))
+    ),
     getters: {
         activeDictionary: state =>
             state.dictionaries.find(
@@ -68,6 +63,35 @@ export default new Vuex.Store({
     },
 
     actions: {
+        exportState({ dispatch, state }) {
+            return new Promise((resolve, reject) => {
+                return dispatch('saveState').then(() => {
+                    if (process.env.IS_WEB) {
+                        var element = document.createElement('a')
+                        element.setAttribute(
+                            'href',
+                            'data:text/json;charset=utf-8,' +
+                                JSON.stringify(localStorage.getItem('store'))
+                        )
+                        element.setAttribute('download', 'export.json')
+                        element.style.display = 'none'
+                        document.body.appendChild(element)
+                        element.click()
+                        document.body.removeChild(element)
+                    } else {
+                        let filePath = require('path').join(
+                            __dirname,
+                            'export.json'
+                        )
+                        reqire('fs').writeFileSync(
+                            filePath,
+                            new Buffer(JSON.stringify(state), 'utf-8')
+                        )
+                        resolve(filePath)
+                    }
+                })
+            })
+        },
         seenVocabulary({ commit, getters }, data) {
             return new Promise((resolve, reject) => {
                 getters.activeDictionary.vocabularies.find(
@@ -318,7 +342,7 @@ export default new Vuex.Store({
                 resolve()
             })
         },
-        deleteCategory({ commit, getters }, categoryId) {
+        deleteCategory({ commit, getters, state }, categoryId) {
             return new Promise((resolve, reject) => {
                 if (getters.vocabularyCountInCategory(categoryId) > 0)
                     return reject(
@@ -329,7 +353,7 @@ export default new Vuex.Store({
                     return reject(
                         'Die Kategorie darf nicht mehr von Karteikästen verwendet werden, wenn sie gelöscht wird. Entferne die entsprechenden Karteikästen, um sie zu löschen.'
                     )
-                    
+
                 commit('DELETE_CATEGORY', categoryId)
                 resolve()
             })
@@ -370,7 +394,13 @@ export default new Vuex.Store({
         },
         loadState({ commit, state }) {
             return new Promise(resolve => {
-                commit('SET_STATE', getLocalState())
+                commit(
+                    'SET_STATE',
+                    Object.assign(
+                        defaultState,
+                        JSON.parse(localStorage.getItem('store'))
+                    )
+                )
                 resolve()
             })
         }

@@ -8,6 +8,7 @@
                     {{ dictionary.lang1 }} / {{ dictionary.lang2 }}
                 </option>
             </select>
+            <button @click="exportFile">Daten exportieren</button>
         </div>
         <nav>
             <router-link to="dictionaries">Wörterbücher</router-link>
@@ -54,9 +55,21 @@ export default {
         }
     },
     methods: {
+        exportFile() {
+            this.exportState()
+                .then(path => {
+                    if (path)
+                        alert(
+                            `Daten wurden erfolgreich exportiert\nSpeicherort: ${path}`
+                        )
+                })
+                .catch(alert)
+        },
+
         ...mapActions({
             setActiveDictionaryId: 'setActiveDictionaryId',
-            saveState: 'saveState'
+            saveState: 'saveState',
+            exportState: 'exportState'
         })
     },
     beforeMount() {
